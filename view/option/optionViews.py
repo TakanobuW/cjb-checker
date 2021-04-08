@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QRadioButton, QLabel
+from PyQt5.QtWidgets import QWidget, QPushButton, QRadioButton, QLabel, QCheckBox
 from PyQt5.QtCore import QCoreApplication
 
 from ..base import BaseWidget
@@ -59,25 +59,25 @@ class Runtime(BaseWidget):
         )
 
 
-class Result(BaseWidget):
+class Check(BaseWidget):
     def __init__(self, parent):
-        super().__init__(parent, title="結果の表示設定")
+        super().__init__(parent, title="確認項目の設定")
         self.master = parent
 
-        self.cb
-        self.rbtn_files = QRadioButton("a", self)
-        self.rbtn_files.move(175, 180)
-        self.rbtn_folders = QRadioButton("b", self)
-        self.rbtn_folders.move(175, 310)
+        self.cb_file_check = QCheckBox("ファイル内容の確認", self)
+        self.cb_file_check.move(175, 180)
+        self.cb_run_check = QCheckBox("回路の動作確認", self)
+        self.cb_file_check.move(175, 310)
 
-        self.rbtn_folders.setChecked(True)
+        self.cb_file_check.setChecked(True)
+        self.cb_run_check.setChecked(True)
 
     def nextPage(self):
-        if self.rbtn_files.isChecked():
-            print(self.rbtn_files.text())
+        if self.cb_file_check.isChecked():
+            self.master.option["runtime"] = "speed"
 
-        if self.rbtn_folders.isChecked():
-            print(self.rbtn_folders.text())
+        if self.cb_run_check.isChecked():
+            self.master.option["runtime"] = "speed"
 
         self.master.setCurrentIndex(
             self.master.currentIndex() + 1

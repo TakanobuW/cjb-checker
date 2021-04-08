@@ -8,13 +8,16 @@ class App(QTabWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Hello")
-        # 1個1個のタブがメニューに対応
+
+        # 各ページのインスタンス化
         self.tab1 = OptionView(self)
         self.tab2 = ProcessView(self)
 
-        # タブページに追加
+        # タブに各ページを追加
         self.addTab(self.tab1, "StartMenu")
         self.addTab(self.tab2, "WelcomeMenu")
+
+        # 各ページとインデックスの対応表
         self.tabIndexDict = {
             "option": 0,
             "process": 1,

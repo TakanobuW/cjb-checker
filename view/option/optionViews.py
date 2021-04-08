@@ -67,7 +67,7 @@ class Check(BaseWidget):
         self.cb_file_check = QCheckBox("ファイル内容の確認", self)
         self.cb_file_check.move(175, 180)
         self.cb_run_check = QCheckBox("回路の動作確認", self)
-        self.cb_file_check.move(175, 310)
+        self.cb_run_check.move(175, 310)
 
         self.cb_file_check.setChecked(True)
         self.cb_run_check.setChecked(True)
@@ -78,6 +78,31 @@ class Check(BaseWidget):
 
         if self.cb_run_check.isChecked():
             self.master.option["runtime"] = "speed"
+
+        self.master.setCurrentIndex(
+            self.master.currentIndex() + 1
+        )
+
+
+class BrowserPath(BaseWidget):
+    def __init__(self, parent):
+        super().__init__(parent, title="ブラウザのパス設定")
+        self.master = parent
+
+        # self.cb_file_check = QCheckBox("ファイル内容の確認", self)
+        # self.cb_file_check.move(175, 180)
+        # self.cb_run_check = QCheckBox("回路の動作確認", self)
+        # self.cb_run_check.move(175, 310)
+
+        # self.cb_file_check.setChecked(True)
+        # self.cb_run_check.setChecked(True)
+
+    def nextPage(self):
+        # if self.cb_file_check.isChecked():
+        #     self.master.option["runtime"] = "speed"
+
+        # if self.cb_run_check.isChecked():
+        #     self.master.option["runtime"] = "speed"
 
         self.master.setCurrentIndex(
             self.master.currentIndex() + 1

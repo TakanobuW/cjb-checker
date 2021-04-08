@@ -54,16 +54,7 @@ class App(QTabWidget):
         # タブパネルのボーダーを削除
         self.setStyleSheet("QTabWidget::pane { border: 0; }")
 
-        # self.master_next_button.setStyleSheet("QPushButton { background-color: white }")
-
         # タブバーを非表示に(↓をコメントすると動きがわかりやすくなるかも)
         self.tabBar().hide()
         self.resize(960, 540)
         self.move(100, 0)
-
-    def master_next_page(self):
-        print(self.currentIndex())
-        self.setCurrentIndex((self.currentIndex()+1) % len(self.tab_index_dict))
-
-    def piyo_piyo(self, text):
-        print(text)

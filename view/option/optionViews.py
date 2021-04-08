@@ -19,10 +19,8 @@ class Target(BaseWidget):
     def nextPage(self):
         if self.rbtn_files.isChecked():
             self.master.option["target"] = "files"
-            # print(self.rbtn_files.text())
         elif self.rbtn_folders.isChecked():
             self.master.option["target"] = "folders"
-            # print(self.rbtn_folders.text())
         else:
             print("Unecpected behavior in option-target")
             self.master.option["target"] = "folders"
@@ -77,9 +75,7 @@ class Check(BaseWidget):
     def checkBoxChangedAction(self, state):
         if (not self.cb_file_check.isChecked()) and (not self.cb_run_check.isChecked()):
             self.disableNextButton()
-            print("dis")
         else:
-            print("en")
             self.enableNextButton()
 
     def nextPage(self):
@@ -103,14 +99,6 @@ class BrowserPath(BaseWidget):
     def __init__(self, parent):
         super().__init__(parent, title="ブラウザのパス設定")
         self.master = parent
-
-        # self.cb_file_check = QCheckBox("ファイル内容の確認", self)
-        # self.cb_file_check.move(175, 180)
-        # self.cb_run_check = QCheckBox("回路の動作確認", self)
-        # self.cb_run_check.move(175, 310)
-
-        # self.cb_file_check.setChecked(True)
-        # self.cb_run_check.setChecked(True)
 
     def nextPage(self):
         if self.master.option["target"] == "files":

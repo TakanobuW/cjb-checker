@@ -23,16 +23,6 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         self.title.move(*title_pos)
         self.title.setStyleSheet(title_css)
 
-        # self.rbtn_folders.setChecked(True)
-
-        # self.button1 = QPushButton('Option', self)
-        # self.button1.move(230, 120)
-        # self.button1.clicked.connect(self.welcome)
-
-        # self.quitbutton1 = QPushButton('exit', self)
-        # self.quitbutton1.move(230, 200)
-        # self.quitbutton1.clicked.connect(QCoreApplication.instance().quit)
-
     def disableNextButton(self):
         self.master_next_button.setEnabled(False)
 
@@ -42,5 +32,3 @@ class BaseWidget(QWidget, metaclass=MyMeta):
     @abstractmethod
     def nextPage(self):
         pass
-        # print(self.currentIndex())
-        # self.setCurrentIndex((self.currentIndex()+1) % len(self.tab_index_dict))

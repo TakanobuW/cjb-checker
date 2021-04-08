@@ -18,10 +18,13 @@ class Target(BaseWidget):
 
     def nextPage(self):
         if self.rbtn_files.isChecked():
-            print(self.rbtn_files.text())
-
-        if self.rbtn_folders.isChecked():
-            print(self.rbtn_folders.text())
+            self.master.option["target"] = "files"
+            # print(self.rbtn_files.text())
+        elif self.rbtn_folders.isChecked():
+            self.master.option["target"] = "folders"
+            # print(self.rbtn_folders.text())
+        else:
+            print("わぁ")
 
         self.master.setCurrentIndex(
             self.master.currentIndex() + 1

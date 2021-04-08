@@ -20,19 +20,20 @@ class App(QTabWidget):
         self.tab1 = optionViews.Target(self)
         self.tab2 = optionViews.Runtime(self)
         self.tab3 = optionViews.Result(self)
-        self.tab4 = optionViews.Log(self)
 
         # タブに各ページを追加
         self.addTab(self.tab1, "option-target")
         self.addTab(self.tab2, "option-runtime")
         self.addTab(self.tab3, "option-result")
-        self.addTab(self.tab4, "option-log")
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
             "option": 0,
             "process": 1,
         }
+
+        # オプション
+        self.option = {}
 
         # タブパネルのボーダーを削除
         self.setStyleSheet("QTabWidget::pane { border: 0; }")

@@ -64,30 +64,7 @@ class Result(BaseWidget):
         super().__init__(parent, title="結果の表示設定")
         self.master = parent
 
-        self.rbtn_files = QRadioButton("a", self)
-        self.rbtn_files.move(175, 180)
-        self.rbtn_folders = QRadioButton("b", self)
-        self.rbtn_folders.move(175, 310)
-
-        self.rbtn_folders.setChecked(True)
-
-    def nextPage(self):
-        if self.rbtn_files.isChecked():
-            print(self.rbtn_files.text())
-
-        if self.rbtn_folders.isChecked():
-            print(self.rbtn_folders.text())
-
-        self.master.setCurrentIndex(
-            self.master.currentIndex() + 1
-        )
-
-
-class Log(BaseWidget):
-    def __init__(self, parent):
-        super().__init__(parent, title="ログの出力設定")
-        self.master = parent
-
+        self.cb
         self.rbtn_files = QRadioButton("a", self)
         self.rbtn_files.move(175, 180)
         self.rbtn_folders = QRadioButton("b", self)

@@ -12,7 +12,7 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         super().__init__(parent)
         self.master = parent
 
-        self.master_next_button = QPushButton('process!', self)
+        self.master_next_button = QPushButton('次へ', self)
         self.master_next_button.move(745, 495)
         self.master_next_button.clicked.connect(self.nextPage)
 

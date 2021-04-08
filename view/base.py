@@ -33,6 +33,12 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         # self.quitbutton1.move(230, 200)
         # self.quitbutton1.clicked.connect(QCoreApplication.instance().quit)
 
+    def disableNextButton(self):
+        self.master_next_button.setEnabled(False)
+
+    def enableNextButton(self):
+        self.master_next_button.setEnabled(True)
+
     @abstractmethod
     def nextPage(self):
         pass

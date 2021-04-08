@@ -3,6 +3,7 @@ from PyQt5.QtCore import QCoreApplication
 
 # from .option.optionViews import Target, Runtime, Result, Log
 from .option import optionViews
+from .select import selectViews
 from .process.processView import ProcessView
 
 
@@ -17,19 +18,34 @@ class App(QTabWidget):
         # self.quitbutton1.clicked.connect(QCoreApplication.instance().quit)
 
         # 各ページのインスタンス化
-        self.tab1 = optionViews.Target(self)
-        self.tab2 = optionViews.Runtime(self)
-        self.tab3 = optionViews.Check(self)
+        self.tab0 = optionViews.Target(self)
+        self.tab1 = optionViews.Runtime(self)
+        self.tab2 = optionViews.Check(self)
+        self.tab3 = optionViews.BrowserPath(self)
+        self.tab4 = selectViews.FileSelect(self)
+        self.tab5 = selectViews.FolderSelect(self)
 
         # タブに各ページを追加
-        self.addTab(self.tab1, "option-target")
-        self.addTab(self.tab2, "option-runtime")
-        self.addTab(self.tab3, "option-check")
+        self.addTab(self.tab0, "option-target")
+        self.addTab(self.tab1, "option-runtime")
+        self.addTab(self.tab2, "option-check")
+        self.addTab(self.tab3, "option-browserPath")
+        self.addTab(self.tab4, "select-file")
+        self.addTab(self.tab5, "select-folder")
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
-            "option": 0,
-            "process": 1,
+            "option": {
+                "target": 0,
+                "runtime": 1,
+                "check": 2,
+                "browserPath": 3,
+            },
+            "select": {
+                "file": 4,
+                "folder": 5,
+            },
+            "process": 6,
         }
 
         # オプション

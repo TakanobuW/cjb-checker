@@ -29,6 +29,9 @@ class BaseWidget(QWidget, metaclass=MyMeta):
     def enableNextButton(self):
         self.next_button.setEnabled(True)
 
+    def hideNextButton(self):
+        self.next_button.hide()
+
     @abstractmethod
     def nextPage(self):
         pass

@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QCoreApplication, Qt
 from typing import List, Set
+import glob
+import os
 
 from ..base import BaseWidget
 
@@ -44,8 +46,8 @@ class SelectedList(QListWidget):
         self._path_list.discard(target_item.text())
         self._updateView()
 
-    def getPathList(self) -> Set[str]:
-        return self._path_list
+    def getPathList(self) -> List[str]:
+        return list(self._path_list)
 
 
 class FileSelect(BaseWidget):
@@ -68,19 +70,21 @@ class FileSelect(BaseWidget):
             self.selected_list.addPath(str(path[0]))
 
     def nextPage(self):
-        if self.rbtn_files.isChecked():
-            self.master.option["target"] = "files"
-            # print(self.rbtn_files.text())
-        elif self.rbtn_folders.isChecked():
-            self.master.option["target"] = "folders"
-            # print(self.rbtn_folders.text())
-        else:
-            print("Unecpected behavior in option-target")
-            self.master.option["target"] = "folders"
+        self.master.file_path_list = self.selected_list.getPathList()
 
-        self.master.setCurrentIndex(
-            self.master.currentIndex() + 1
-        )
+        if self.master.option["check"]["file"]:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["process"]["file"]
+            )
+        elif self.master.option["check"]["run"]:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["process"]["run"]
+            )
+        else:
+            print("Unecpected behavior in select-file")
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["result"]
+            )
 
 
 class FolderSelect(BaseWidget):
@@ -102,16 +106,19 @@ class FolderSelect(BaseWidget):
         self.selected_list.addPath(path)
 
     def nextPage(self):
-        if self.rbtn_files.isChecked():
-            self.master.option["target"] = "files"
-            # print(self.rbtn_files.text())
-        elif self.rbtn_folders.isChecked():
-            self.master.option["target"] = "folders"
-            # print(self.rbtn_folders.text())
-        else:
-            print("Unecpected behavior in option-target")
-            self.master.option["target"] = "folders"
+        for dir_path in self.selected_list.getPathList():
+            self.master.file_path_list += glob.glob(os.path.join(dir_path, "*.cjb"))
 
-        self.master.setCurrentIndex(
-            self.master.currentIndex() + 1
-        )
+        if self.master.option["check"]["file"]:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["process"]["file"]
+            )
+        elif self.master.option["check"]["run"]:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["process"]["run"]
+            )
+        else:
+            print("Unecpected behavior in select-folder")
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["result"]
+            )

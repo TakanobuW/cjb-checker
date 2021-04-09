@@ -17,6 +17,12 @@ class App(QTabWidget):
         # self.quitbutton1.move(230, 200)
         # self.quitbutton1.clicked.connect(QCoreApplication.instance().quit)
 
+        # オプション
+        self.option = {}
+
+        # 対象ファイルのパス
+        self.file_path_list = []
+
         # 各ページのインスタンス化
         self.tab0 = optionViews.Target(self)
         self.tab1 = optionViews.Runtime(self)
@@ -53,12 +59,10 @@ class App(QTabWidget):
             },
             "process": {
                 "file": 6,
-                "process": 7,
+                "run": 7,
             },
+            "result": 8,
         }
-
-        # オプション
-        self.option = {}
 
         # タブパネルのボーダーを削除
         self.setStyleSheet("QTabWidget::pane { border: 0; }")

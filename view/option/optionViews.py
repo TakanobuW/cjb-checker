@@ -68,13 +68,14 @@ class Check(BaseWidget):
         self.cb_run_check = QCheckBox("回路の動作確認", self)
         self.cb_run_check.move(175, 310)
         self.cb_run_check.stateChanged.connect(self.checkBoxChangedAction)
-        self.cb_file_check.setChecked(True)
-        self.cb_run_check.setChecked(True)
 
         self.rbtn_work1 = QRadioButton("課題1", self)
         self.rbtn_work1.move(200, 360)
         self.rbtn_work2 = QRadioButton("課題2", self)
         self.rbtn_work2.move(200, 390)
+
+        self.cb_file_check.setChecked(True)
+        self.cb_run_check.setChecked(True)
         self.rbtn_work1.setChecked(True)
 
     def checkBoxChangedAction(self, state):
@@ -105,12 +106,13 @@ class Check(BaseWidget):
             self.master.option["check"]["run"] = True
 
             if self.rbtn_work1.isChecked():
-                self.master.option["check"]["run"]["work"] = "work1"
+                self.master.option["check"]["run-target"] = "work1"
             elif self.rbtn_work2.isChecked():
-                self.master.option["check"]["run"]["work"] = "work2"
+                self.master.option["check"]["run-target"] = "work2"
             else:
                 print("Unecpected behavior in option-check")
-                self.master.option["check"]["run"]["work"] = "work1"
+                self.master.option["check"]["run-target"] = "work1"
+
         else:
             self.master.option["check"]["run"] = True
 

@@ -16,7 +16,7 @@ class FileCheckProcessView(BaseWidget):
         self.hideNextButton()
 
     def execute_check(self):
-        pass
+        print(self.master.file_path_list)
 
     def nextPage(self):
         if self.master.option["check"]["run"]:
@@ -41,7 +41,15 @@ class RunCheckProcessView(BaseWidget):
         self.hideNextButton()
 
     def execute_check(self):
-        pass
+        print(self.master.file_path_list)
+
+        if self.master.option["check"]["run-target"] == "work1":
+            pass
+        elif self.master.option["check"]["run-target"] == "work2":
+            pass
+        else:
+            print("Unecpected behavior in process-run")
+            pass
 
     def nextPage(self):
         self.master.setCurrentIndex(

@@ -101,6 +101,8 @@ class BrowserPath(BaseWidget):
         self.master = parent
 
     def nextPage(self):
+        self.master.option["browserPath"] = None
+
         if self.master.option["target"] == "files":
             self.master.setCurrentIndex(
                 self.master.tab_index_dict["select"]["file"]

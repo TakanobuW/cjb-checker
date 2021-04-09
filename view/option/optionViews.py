@@ -68,15 +68,25 @@ class Check(BaseWidget):
         self.cb_run_check = QCheckBox("回路の動作確認", self)
         self.cb_run_check.move(175, 310)
         self.cb_run_check.stateChanged.connect(self.checkBoxChangedAction)
-
         self.cb_file_check.setChecked(True)
         self.cb_run_check.setChecked(True)
+
+        self.rbtn_work1 = QRadioButton("課題1", self)
+        self.rbtn_work1.move(200, 360)
+        self.rbtn_work2 = QRadioButton("課題2", self)
+        self.rbtn_work2.move(200, 390)
+        self.rbtn_work1.setChecked(True)
 
     def checkBoxChangedAction(self, state):
         if (not self.cb_file_check.isChecked()) and (not self.cb_run_check.isChecked()):
             self.disableNextButton()
         else:
             self.enableNextButton()
+
+        if self.cb_run_check.isChecked():
+            self.rbtn_work1.setEnabled(True)
+        else:
+            self.rbtn_work1.setEnabled(False)
 
     def nextPage(self):
         self.master.option["check"] = {
@@ -86,8 +96,20 @@ class Check(BaseWidget):
 
         if self.cb_file_check.isChecked():
             self.master.option["check"]["file"] = True
+        else:
+            self.master.option["check"]["file"] = False
 
         if self.cb_run_check.isChecked():
+            self.master.option["check"]["run"] = True
+
+            if self.cb_work1.isChecked():
+                self.master.option["check"]["run"]["work"] = "work1"
+            elif self.cb_work2.isChecked():
+                self.master.option["check"]["run"]["work"] = "work2"
+            else:
+                print("Unecpected behavior in option-runtime")
+                self.master.option["check"]["run"]["work"] = "work1"
+        else:
             self.master.option["check"]["run"] = True
 
         self.master.setCurrentIndex(

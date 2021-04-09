@@ -53,12 +53,19 @@ class FileSelect(BaseWidget):
         super().__init__(parent, title="ファイルの選択")
         self.master = parent
 
-        self.rbtn_files = QRadioButton("ファイル単位", self)
-        self.rbtn_files.move(175, 180)
-        self.rbtn_folders = QRadioButton("フォルダー単位", self)
-        self.rbtn_folders.move(175, 310)
+        self.add_button = QPushButton('対象ファイルを追加', self)
+        self.add_button.move(450, 430)
+        self.add_button.clicked.connect(self.showFileDialog)
 
-        self.rbtn_folders.setChecked(True)
+        self.selected_list = SelectedList(self)
+        self.selected_list.resize(860, 300)
+        self.selected_list.move(50, 100)
+
+    def showFileDialog(self):
+        # 第二引数はダイアログのタイトル、第三引数は表示するパス
+        path = QFileDialog.getOpenFileName(self, '対象ファイルの選択', '/home', filter="*.cjb")
+        if path[0] != "":
+            self.selected_list.addPath(str(path[0]))
 
     def nextPage(self):
         if self.rbtn_files.isChecked():

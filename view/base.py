@@ -12,9 +12,9 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         super().__init__(parent)
         self.master = parent
 
-        self.master_next_button = QPushButton('次へ', self)
-        self.master_next_button.move(745, 495)
-        self.master_next_button.clicked.connect(self.nextPage)
+        self.next_button = QPushButton('次へ', self)
+        self.next_button.move(745, 495)
+        self.next_button.clicked.connect(self.nextPage)
 
         title_css = "QLabel { font-size: 30px }"
         title_pos = [30, 30]
@@ -24,10 +24,10 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         self.title.setStyleSheet(title_css)
 
     def disableNextButton(self):
-        self.master_next_button.setEnabled(False)
+        self.next_button.setEnabled(False)
 
     def enableNextButton(self):
-        self.master_next_button.setEnabled(True)
+        self.next_button.setEnabled(True)
 
     @abstractmethod
     def nextPage(self):

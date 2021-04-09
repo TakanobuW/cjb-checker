@@ -104,9 +104,9 @@ class Check(BaseWidget):
         if self.cb_run_check.isChecked():
             self.master.option["check"]["run"] = True
 
-            if self.cb_work1.isChecked():
+            if self.rbtn_work1.isChecked():
                 self.master.option["check"]["run"]["work"] = "work1"
-            elif self.cb_work2.isChecked():
+            elif self.rbtn_work2.isChecked():
                 self.master.option["check"]["run"]["work"] = "work2"
             else:
                 print("Unecpected behavior in option-check")

@@ -85,8 +85,10 @@ class Check(BaseWidget):
 
         if self.cb_run_check.isChecked():
             self.rbtn_work1.setEnabled(True)
+            self.rbtn_work2.setEnabled(True)
         else:
             self.rbtn_work1.setEnabled(False)
+            self.rbtn_work2.setEnabled(False)
 
     def nextPage(self):
         self.master.option["check"] = {

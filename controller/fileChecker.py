@@ -1,15 +1,20 @@
 import os
 import numpy as np
+import json
 
 
 class FileChecker:
     def __init__(self):
+        self.header_len = 10
+        self.restore_key_idx = 8
+
         self.result = []
 
     def readFile(self, file_path):
         with open(file_path, mode="rb") as fp:
             bin_data = fp.read()
 
+        file_info = {}
         file_info["fname"] = os.path.basename(file_path).replace(".cjb", "")
         file_info["bytes"] = len(bin_data)
 

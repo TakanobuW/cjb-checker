@@ -4,7 +4,7 @@ from PyQt5.QtCore import QCoreApplication
 # from .option.optionViews import Target, Runtime, Result, Log
 from .option import optionViews
 from .select import selectViews
-from .process.processView import ProcessView
+from .process import processView
 
 
 class App(QTabWidget):
@@ -22,8 +22,12 @@ class App(QTabWidget):
         self.tab1 = optionViews.Runtime(self)
         self.tab2 = optionViews.Check(self)
         self.tab3 = optionViews.BrowserPath(self)
+
         self.tab4 = selectViews.FileSelect(self)
         self.tab5 = selectViews.FolderSelect(self)
+
+        self.tab6 = processView.FileCheckProcessView(self)
+        self.tab7 = processView.RunCheckProcessView(self)
 
         # タブに各ページを追加
         self.addTab(self.tab0, "option-target")
@@ -32,6 +36,8 @@ class App(QTabWidget):
         self.addTab(self.tab3, "option-browserPath")
         self.addTab(self.tab4, "select-file")
         self.addTab(self.tab5, "select-folder")
+        self.addTab(self.tab6, "process-file")
+        self.addTab(self.tab7, "process-run")
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
@@ -45,7 +51,10 @@ class App(QTabWidget):
                 "file": 4,
                 "folder": 5,
             },
-            "process": 6,
+            "process": {
+                "file": 6,
+                "process": 7,
+            },
         }
 
         # オプション

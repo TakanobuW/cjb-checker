@@ -23,6 +23,10 @@ class App(QTabWidget):
         # 対象ファイルのパス
         self.file_path_list = []
 
+        # チェックの結果
+        self.file_check_result = []
+        self.run_check_result = []
+
         # 各ページのインスタンス化
         self.tab0 = optionViews.Target(self)
         self.tab1 = optionViews.Runtime(self)

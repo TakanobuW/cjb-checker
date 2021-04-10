@@ -3,7 +3,7 @@ from PyQt5.QtCore import QCoreApplication
 
 from ..base import BaseWidget
 
-from controller.fileChecker import FileChecker
+from controller.fileChecker import FileChecker, RunChecker4Work1, RunChecker4Work2
 
 
 class FileCheckProcessView(BaseWidget):
@@ -63,21 +63,28 @@ class RunCheckProcessView(BaseWidget):
         self.master = parent
 
         self.run_button = QPushButton('実行', self)
-        self.run_button.move(450, 430)
+        self.run_button.move(450, 490)
         self.run_button.clicked.connect(self.executeCheck)
 
-        self.hideNextButton()
+        self.table = QTableWidget(self)
+        self.table.hide()
+
+        self.disableNextButton()
 
     def executeCheck(self):
-        print(self.master.file_path_list)
+        self.run_button.hide()
 
         if self.master.option["check"]["run-target"] == "work1":
-            pass
+            checker = RunChecker4Work1(browserPath=self.master.option["browserPath"])
         elif self.master.option["check"]["run-target"] == "work2":
-            pass
+            checker = RunChecker4Work2(browserPath=self.master.option["browserPath"])
         else:
             print("Unecpected behavior in process-run")
-            pass
+            checker = RunChecker4Work1(browserPath=self.master.option["browserPath"])
+
+        for nth, path in enumerate(self.master.file_path_list):
+            # print(f"{nth+1} / {len(self.master.file_path_list)}")
+            checker.readFile(file_path=path)
 
     def nextPage(self):
         self.master.setCurrentIndex(

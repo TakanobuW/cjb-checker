@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import json
+from abc import ABC, abstractmethod
 
 
 class FileChecker:
@@ -42,3 +43,43 @@ class FileChecker:
 
     def getResult(self):
         return self.result
+
+
+class RunChecker(ABC):
+    def __init__(self, browserPath):
+        self.result = []
+
+        self.click_stop_time = 0.05  # sec
+
+        # self.driver = webdriver.Chrome("/usr/bin/chromedriver")
+        self.driver = webdriver.Chrome(browserPath)
+        self.driver.set_window_size(800, 450)
+        self.driver.implicitly_wait(0.3)
+
+        self.driver.get("https://haru1843.github.io/circuit-simulation-app/usage")
+        time.sleep(2)
+
+        # self.file_input_element = self.driver.find_element_by_id("ul-input")
+
+    @abstractmethod
+    def readFile(self, file_path: str):
+        pass
+
+    def getResult(self):
+        return self.result
+
+
+class RunChecker4Work1(RunChecker):
+    def __init__(self, browserPath):
+        super().__init__(browerPath)
+
+    def readFile(self, file_path: str):
+        pass
+
+
+class RunChecker4Work2(RunChecker):
+    def __init__(self, browserPath):
+        super().__init__(browerPath)
+
+    def readFile(self, file_path: str):
+        pass

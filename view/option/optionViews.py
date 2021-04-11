@@ -112,9 +112,8 @@ class Check(BaseWidget):
             else:
                 print("Unecpected behavior in option-check")
                 self.master.option["check"]["run-target"] = "work1"
-
         else:
-            self.master.option["check"]["run"] = True
+            self.master.option["check"]["run"] = False
 
         self.master.setCurrentIndex(
             self.master.currentIndex() + 1

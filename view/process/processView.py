@@ -1,5 +1,14 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QTableWidget, QTableWidgetItem, QMessageBox
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import (
+    QWidget,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QMessageBox,
+    QLabel,
+    QProgressBar
+)
+from PyQt5.QtCore import QCoreApplication, Qt, QThread
+
 
 from ..base import BaseWidget
 
@@ -68,38 +77,57 @@ class RunCheckProcessView(BaseWidget):
         self.run_button.move(450, 490)
         self.run_button.clicked.connect(self.executeCheck)
 
+        self.state_message = QLabel(self)
+        self.state_message.setAlignment(Qt.AlignCenter)
+        self.state_message.move(150, 100)
+        self.state_message.setFixedWidth(760)
+
+        self.progress = QProgressBar(self)
+        self.progress.setGeometry(100, 150, 760, 25)
+        self.progress.setMaximum(100)
+
         self.table = QTableWidget(self)
         self.table.hide()
 
         self.disableNextButton()
+
+        self.thread = QThread()
 
     def executeCheck(self):
         self.run_button.hide()
 
         # チェックする課題に応じてインスタンスを生成
         if self.master.option["check"]["run-target"] == "work1":
-            checker = RunChecker4Work1(browserPath=self.master.option["browserPath"])
+            self.checker = RunChecker4Work1(
+                browserPath=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list)
         elif self.master.option["check"]["run-target"] == "work2":
-            checker = RunChecker4Work2(browserPath=self.master.option["browserPath"])
+            self.checker = RunChecker4Work2(
+                browserPath=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list)
         else:
             print("Unecpected behavior in process-run")
-            checker = RunChecker4Work1(browserPath=self.master.option["browserPath"])
+            self.checker = RunChecker4Work1(
+                browserPath=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list)
 
-        try:
-            checker.launchBrowser()
-        except TimeoutException as error:
-            QMessageBox.warning(None, "TimeoutExceptionエラー", "サイトへの初期接続が遅すぎます.", QMessageBox.Yes)
-            self.run_button.show()
-            self.run_button.setText("再実行")
-            checker.closeDriver()
-            return
+        self.checker.moveToThread(self.thread)
+        self.thread.started.connect(self.checker.checkFiles)
+        self.checker.progressChanged.connect(self.progress.setValue, Qt.QueuedConnection)
+        self.thread.finished.connect(self.enableNextButton)
 
-        for nth, path in enumerate(self.master.file_path_list):
-            print(f"{nth+1} / {len(self.master.file_path_list)}")
-            checker.checkFile(file_path=path)
+        self.thread.start()
 
-        checker.closeDriver()
-        self.enableNextButton()
+        # try:
+        #     checker.checkFiles(self.master.file_path_list)
+        # except TimeoutException as error:
+        #     QMessageBox.warning(None, "TimeoutExceptionエラー", "サイトの応答が遅すぎます.", QMessageBox.Yes)
+        #     self.run_button.show()
+        #     self.run_button.setText("再実行")
+        #     checker.closeDriver()
+        #     return
+
+        # self.enableNextButton()
 
     def nextPage(self):
         self.master.setCurrentIndex(

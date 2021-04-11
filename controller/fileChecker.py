@@ -1,13 +1,16 @@
 import os
 import numpy as np
 import json
-from abc import ABC, abstractmethod
+import time
+from abc import ABC, ABCMeta, abstractmethod
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class FileChecker:
@@ -51,29 +54,48 @@ class FileChecker:
         return self.result
 
 
-class RunChecker(ABC):
-    def __init__(self, browserPath):
-        self.result = []
+class MyMeta(ABCMeta, type(QObject)):
+    pass
 
+
+class RunChecker(QObject, metaclass=MyMeta):
+    progressChanged = pyqtSignal(int)
+
+    def __init__(self, browserPath, file_path_list):
+        super().__init__()
+
+        self.result = []
+        self.browserPath = browserPath
+        self.file_path_list = file_path_list
+
+    def _launchBrowser(self):
         # self.driver = webdriver.Chrome("/usr/bin/chromedriver")
-        if browserPath is None:
+        if self.browserPath is None:
             self.driver = webdriver.Chrome()
         else:
-            self.driver = webdriver.Chrome(browserPath)
+            self.driver = webdriver.Chrome(self.browserPath)
 
         # ドライバーの設定
         self.driver.set_window_size(800, 450)
         self.driver.implicitly_wait(1)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
-    def launchBrowser(self):
         self.driver.get("https://haru1843.github.io/circuit-simulation-app/usage")
-        WebDriverWait(self.driver, 1).until(
-            (EC.presence_of_element_located((By.ID, "xxxasxsdf"))))  # アップロードボタンが現れるまで
+        WebDriverWait(self.driver, 5).until(
+            (EC.presence_of_element_located((By.ID, "ul-button"))))  # アップロードボタンが現れるまで
 
         self.file_upload_button = self.driver.find_element_by_id("ul-button")
 
+    def checkFiles(self):
+        self._launchBrowser()
+
+        for nth, file_path in enumerate(self.file_path_list):
+            self._checkFile(file_path)
+            self.progressChanged.emit(((nth + 1) / len(self.file_path_list)) * 100)
+
+        self.closeDriver()
+
     @abstractmethod
-    def checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str):
         pass
 
     def getResult(self):
@@ -85,16 +107,16 @@ class RunChecker(ABC):
 
 
 class RunChecker4Work1(RunChecker):
-    def __init__(self, browserPath):
-        super().__init__(browserPath)
+    def __init__(self, browserPath, file_path_list):
+        super().__init__(browserPath, file_path_list)
 
-    def checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str):
         self.file_upload_button.send_keys(file_path)
 
 
 class RunChecker4Work2(RunChecker):
-    def __init__(self, browserPath):
-        super().__init__(browserPath)
+    def __init__(self, browserPath, file_path_list):
+        super().__init__(browserPath, file_path_list)
 
-    def checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str):
         self.file_upload_button.send_keys(file_path)

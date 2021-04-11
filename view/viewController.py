@@ -5,6 +5,7 @@ from PyQt5.QtCore import QCoreApplication
 from .option import optionViews
 from .select import selectViews
 from .process import processView
+from .log import logViews
 
 
 class App(QTabWidget):
@@ -39,6 +40,9 @@ class App(QTabWidget):
         self.tab6 = processView.FileCheckProcessView(self)
         self.tab7 = processView.RunCheckProcessView(self)
 
+        self.tab8 = logViews.Log4File(self)
+        self.tab9 = logViews.Log4Run(self)
+
         # タブに各ページを追加
         self.addTab(self.tab0, "option-target")
         self.addTab(self.tab1, "option-runtime")
@@ -48,6 +52,8 @@ class App(QTabWidget):
         self.addTab(self.tab5, "select-folder")
         self.addTab(self.tab6, "process-file")
         self.addTab(self.tab7, "process-run")
+        self.addTab(self.tab8, "log-file")
+        self.addTab(self.tab9, "log-run")
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
@@ -65,7 +71,10 @@ class App(QTabWidget):
                 "file": 6,
                 "run": 7,
             },
-            "result": 8,
+            "log": {
+                "file": 8,
+                "run": 9,
+            },
         }
 
         # タブパネルのボーダーを削除

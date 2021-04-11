@@ -64,7 +64,7 @@ class FileCheckProcessView(BaseWidget):
             )
         else:
             self.master.setCurrentIndex(
-                self.master.tab_index_dict["result"]
+                self.master.tab_index_dict["log"]["file"]
             )
 
 
@@ -130,6 +130,11 @@ class RunCheckProcessView(BaseWidget):
         self.thread.start()
 
     def nextPage(self):
-        self.master.setCurrentIndex(
-            self.master.tab_index_dict["result"]
-        )
+        if self.master.option["check"]["file"]:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["log"]["file"]
+            )
+        else:
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["log"]["run"]
+            )

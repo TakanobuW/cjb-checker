@@ -6,6 +6,7 @@ from .option import optionViews
 from .select import selectViews
 from .process import processView
 from .log import logViews
+from .end import endView
 
 
 class App(QTabWidget):
@@ -43,6 +44,8 @@ class App(QTabWidget):
         self.tab8 = logViews.Log4File(self)
         self.tab9 = logViews.Log4Run(self)
 
+        self.tab10 = endView.End(self)
+
         # タブに各ページを追加
         self.addTab(self.tab0, "option-target")
         self.addTab(self.tab1, "option-runtime")
@@ -54,6 +57,7 @@ class App(QTabWidget):
         self.addTab(self.tab7, "process-run")
         self.addTab(self.tab8, "log-file")
         self.addTab(self.tab9, "log-run")
+        self.addTab(self.tab10, "end")
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
@@ -75,6 +79,7 @@ class App(QTabWidget):
                 "file": 8,
                 "run": 9,
             },
+            "end": 10
         }
 
         # タブパネルのボーダーを削除

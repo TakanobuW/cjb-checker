@@ -60,6 +60,8 @@ class MyMeta(ABCMeta, type(QObject)):
 
 class RunChecker(QObject, metaclass=MyMeta):
     progressChanged = pyqtSignal(int)
+    timeChanged = pyqtSignal(str)
+    checkEnd = pyqtSignal()
 
     def __init__(self, browserPath, file_path_list):
         super().__init__()
@@ -88,11 +90,25 @@ class RunChecker(QObject, metaclass=MyMeta):
     def checkFiles(self):
         self._launchBrowser()
 
+        start_time = time.time()
+        time_str_fmt = "{:02d}m{:02d}s : {:02d}m{:02d}s"
         for nth, file_path in enumerate(self.file_path_list):
             self._checkFile(file_path)
             self.progressChanged.emit(((nth + 1) / len(self.file_path_list)) * 100)
 
-        self.closeDriver()
+            elapsed_second = time.time() - start_time
+            remain_second = (elapsed_second / (nth+1)) * (len(self.file_path_list) - (nth+1))
+            elapsed_second = round(elapsed_second)
+            remain_second = round(remain_second)
+            self.timeChanged.emit(time_str_fmt.format(
+                elapsed_second // 60, elapsed_second % 60,
+                remain_second // 60, remain_second % 60
+            ))
+
+        self.checkEnd.emit()
+
+        self.driver.close()
+        self.driver.quit()
 
     @abstractmethod
     def _checkFile(self, file_path: str):

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QProgressBar
 )
-from PyQt5.QtCore import QCoreApplication, Qt, QThread
+from PyQt5.QtCore import QCoreApplication, Qt, QThread, pyqtSlot
 
 
 from ..base import BaseWidget
@@ -77,13 +77,15 @@ class RunCheckProcessView(BaseWidget):
         self.run_button.move(450, 490)
         self.run_button.clicked.connect(self.executeCheck)
 
-        self.state_message = QLabel(self)
-        self.state_message.setAlignment(Qt.AlignCenter)
-        self.state_message.move(150, 100)
-        self.state_message.setFixedWidth(760)
+        self.remain_time_msg = QLabel(self)
+        self.remain_time_msg.setAlignment(Qt.AlignCenter)
+        self.remain_time_msg.move(150, 230)
+        self.remain_time_msg.setFixedWidth(660)
+        self.remain_time_msg.setText("経過時間 : 予測残り時間")
+        self.remain_time_msg.setStyleSheet("QLabel { font-size: 22px }")
 
         self.progress = QProgressBar(self)
-        self.progress.setGeometry(100, 150, 760, 25)
+        self.progress.setGeometry(100, 280, 760, 25)
         self.progress.setMaximum(100)
 
         self.table = QTableWidget(self)
@@ -91,7 +93,13 @@ class RunCheckProcessView(BaseWidget):
 
         self.disableNextButton()
 
-        self.thread = QThread()
+        self.thread = QThread(self)
+
+    def checkEndAction(self):
+        self.enableNextButton()
+
+        if self.thread.isRunning():
+            self.thread.terminate()
 
     def executeCheck(self):
         self.run_button.hide()
@@ -111,23 +119,15 @@ class RunCheckProcessView(BaseWidget):
                 browserPath=self.master.option["browserPath"],
                 file_path_list=self.master.file_path_list)
 
+        # メインの方の描画更新がとまってしまうため,
+        # インスタンスをスレッド化し, 別スレッドにて実行
         self.checker.moveToThread(self.thread)
         self.thread.started.connect(self.checker.checkFiles)
         self.checker.progressChanged.connect(self.progress.setValue, Qt.QueuedConnection)
-        self.thread.finished.connect(self.enableNextButton)
+        self.checker.timeChanged.connect(self.remain_time_msg.setText, Qt.QueuedConnection)
+        self.checker.checkEnd.connect(self.checkEndAction, Qt.QueuedConnection)
 
         self.thread.start()
-
-        # try:
-        #     checker.checkFiles(self.master.file_path_list)
-        # except TimeoutException as error:
-        #     QMessageBox.warning(None, "TimeoutExceptionエラー", "サイトの応答が遅すぎます.", QMessageBox.Yes)
-        #     self.run_button.show()
-        #     self.run_button.setText("再実行")
-        #     checker.closeDriver()
-        #     return
-
-        # self.enableNextButton()
 
     def nextPage(self):
         self.master.setCurrentIndex(

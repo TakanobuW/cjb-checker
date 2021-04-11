@@ -3,6 +3,12 @@ import numpy as np
 import json
 from abc import ABC, abstractmethod
 
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+
 
 class FileChecker:
     def __init__(self):
@@ -11,7 +17,7 @@ class FileChecker:
 
         self.result = []
 
-    def readFile(self, file_path):
+    def checkFile(self, file_path):
         with open(file_path, mode="rb") as fp:
             bin_data = fp.read()
 
@@ -49,37 +55,46 @@ class RunChecker(ABC):
     def __init__(self, browserPath):
         self.result = []
 
-        self.click_stop_time = 0.05  # sec
-
         # self.driver = webdriver.Chrome("/usr/bin/chromedriver")
-        self.driver = webdriver.Chrome(browserPath)
+        if browserPath is None:
+            self.driver = webdriver.Chrome()
+        else:
+            self.driver = webdriver.Chrome(browserPath)
+
+        # ドライバーの設定
         self.driver.set_window_size(800, 450)
-        self.driver.implicitly_wait(0.3)
+        self.driver.implicitly_wait(1)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
+    def launchBrowser(self):
         self.driver.get("https://haru1843.github.io/circuit-simulation-app/usage")
-        time.sleep(2)
+        WebDriverWait(self.driver, 1).until(
+            (EC.presence_of_element_located((By.ID, "xxxasxsdf"))))  # アップロードボタンが現れるまで
 
-        # self.file_input_element = self.driver.find_element_by_id("ul-input")
+        self.file_upload_button = self.driver.find_element_by_id("ul-button")
 
     @abstractmethod
-    def readFile(self, file_path: str):
+    def checkFile(self, file_path: str):
         pass
 
     def getResult(self):
         return self.result
 
+    def closeDriver(self):
+        self.driver.close()
+        self.driver.quit()
+
 
 class RunChecker4Work1(RunChecker):
     def __init__(self, browserPath):
-        super().__init__(browerPath)
+        super().__init__(browserPath)
 
-    def readFile(self, file_path: str):
-        pass
+    def checkFile(self, file_path: str):
+        self.file_upload_button.send_keys(file_path)
 
 
 class RunChecker4Work2(RunChecker):
     def __init__(self, browserPath):
-        super().__init__(browerPath)
+        super().__init__(browserPath)
 
-    def readFile(self, file_path: str):
-        pass
+    def checkFile(self, file_path: str):
+        self.file_upload_button.send_keys(file_path)

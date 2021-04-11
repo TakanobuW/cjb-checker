@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QScrollArea,
     QVBoxLayout,
-    QListWidget
+    QListWidget,
+    QMessageBox
 )
 from PyQt5.QtCore import QCoreApplication, Qt
 from typing import List, Set
@@ -72,7 +73,9 @@ class FileSelect(BaseWidget):
     def nextPage(self):
         self.master.file_path_list = self.selected_list.getPathList()
 
-        if self.master.option["check"]["file"]:
+        if len(self.master.file_path_list) == 0:
+            QMessageBox.warning(None, "ValueError!", "CJBファイルが選択されていません.", QMessageBox.Yes)
+        elif self.master.option["check"]["file"]:
             self.master.setCurrentIndex(
                 self.master.tab_index_dict["process"]["file"]
             )
@@ -103,13 +106,16 @@ class FolderSelect(BaseWidget):
     def showFileDialog(self):
         # 第二引数はダイアログのタイトル、第三引数は表示するパス
         path = str(QFileDialog.getExistingDirectory(self, '対象フォルダの選択', '/home'))
-        self.selected_list.addPath(path)
+        if path != "":
+            self.selected_list.addPath(path)
 
     def nextPage(self):
         for dir_path in self.selected_list.getPathList():
             self.master.file_path_list += glob.glob(os.path.join(dir_path, "*.cjb"))
 
-        if self.master.option["check"]["file"]:
+        if len(self.master.file_path_list) == 0:
+            QMessageBox.warning(None, "ValueError!", "CJBファイルのあるフォルダが選択されていません.", QMessageBox.Yes)
+        elif self.master.option["check"]["file"]:
             self.master.setCurrentIndex(
                 self.master.tab_index_dict["process"]["file"]
             )

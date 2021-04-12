@@ -31,7 +31,8 @@ class FileChecker:
         # 作成日時の取得
         date_bin_data = bin_data[:9]
         date_fmt_str = "{:02d}{:02d}-{:02d}{:02d}-{:02d}:{:02d}:{:02d}:{:02d}{:02d}"
-        file_info["date"] = date_fmt_str.format(*list(map(lambda x: int(x), date_bin_data)))
+        file_info["date"] = date_fmt_str.format(
+            *list(map(lambda x: int(x), date_bin_data)))
 
         # 復元キーの取得 と デコード(binary->文字列)
         restore_val = date_bin_data[self.restore_key_idx]
@@ -81,7 +82,8 @@ class RunChecker(QObject, metaclass=MyMeta):
         self.driver.set_window_size(800, 450)
         self.driver.implicitly_wait(1)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
-        self.driver.get("https://haru1843.github.io/circuit-simulation-app/usage")
+        self.driver.get(
+            "https://haru1843.github.io/circuit-simulation-app/usage")
         WebDriverWait(self.driver, 5).until(
             (EC.presence_of_element_located((By.ID, "ul-button"))))  # アップロードボタンが現れるまで
 
@@ -94,10 +96,12 @@ class RunChecker(QObject, metaclass=MyMeta):
         time_str_fmt = "{:02d}m{:02d}s : {:02d}m{:02d}s"
         for nth, file_path in enumerate(self.file_path_list):
             self._checkFile(file_path)
-            self.progressChanged.emit(((nth + 1) / len(self.file_path_list)) * 100)
+            self.progressChanged.emit(
+                ((nth + 1) / len(self.file_path_list)) * 100)
 
             elapsed_second = time.time() - start_time
-            remain_second = (elapsed_second / (nth+1)) * (len(self.file_path_list) - (nth+1))
+            remain_second = (elapsed_second / (nth+1)) * \
+                (len(self.file_path_list) - (nth+1))
             elapsed_second = round(elapsed_second)
             remain_second = round(remain_second)
             self.timeChanged.emit(time_str_fmt.format(
@@ -128,6 +132,65 @@ class RunChecker4Work1(RunChecker):
 
     def _checkFile(self, file_path: str):
         self.file_upload_button.send_keys(file_path)
+
+        circuit = self.driver.find_element_by_css_selector(
+            'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar)')
+
+        switches = circuit.find_elements_by_class_name(
+            "simcir-basicset-switch")
+
+        if len(switches) != 3:
+            print("課題2です.")
+            return
+        else:
+            print("課題1です.")
+
+        button_list = [switch.find_element_by_class_name(
+            "simcir-basicset-switch-button") for switch in switches]
+
+        # 全部のボタンをオフにする
+        for btn in button_list:
+            if "simcir-basicset-switch-button-pressed" in btn.get_attribute("class"):
+                btn.click()
+
+        # 7seg取得
+        device_list = circuit.find_elements_by_class_name("simcir-device")
+        target_idx = 0
+        for idx, device in enumerate(device_list):
+            if len(device.find_elements_by_class_name("simcir-node-type-in")) == 8:
+                target_idx = idx
+                break
+                # device.screenshot("7seg.png")
+
+        # 7segの状態取得
+        seven_seg_node_list = device_list[target_idx].find_elements_by_class_name(
+            "simcir-node-type-in")
+
+        def get_7seg_state():
+            segment_mapping_list = [
+                'ooooooxx',
+                'xooxxxxx',
+                'ooxooxox',
+                'ooooxxox',
+                'xooxxoox',
+                'oxooxoox',
+                'oxooooox',
+                'oooxxoxx',
+            ]
+
+            # !!!!!!!!!!!!!!!!!input-node の順番のsort
+            try:
+                return segment_mapping_list.index("".join(["o" if "simcir-node-hot" in node.get_attribute("class") else "x" for node in seven_seg_node_list]))
+            except ValueError:
+                return -1
+
+        # ボタンをクリック(0->7)
+        print(get_7seg_state())
+        click_btn_idx_list = [0, 1, 2, 1, 0, 1, 2]
+        for click_btn_idx in click_btn_idx_list:
+            button_list[click_btn_idx].click()
+            time.sleep(0.1)
+            print(get_7seg_state())
 
 
 class RunChecker4Work2(RunChecker):

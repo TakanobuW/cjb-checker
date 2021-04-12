@@ -13,7 +13,7 @@ class App(QTabWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Hello")
+        self.setWindowTitle("CJBチェッカー")
 
         # self.quitbutton1 = QPushButton('exit', self)
         # self.quitbutton1.move(230, 200)
@@ -87,5 +87,6 @@ class App(QTabWidget):
 
         # タブバーを非表示に(↓をコメントすると動きがわかりやすくなるかも)
         self.tabBar().hide()
-        self.resize(960, 540)
+        # self.resize(960, 540)
+        self.setFixedSize(960, 540)
         self.move(100, 0)

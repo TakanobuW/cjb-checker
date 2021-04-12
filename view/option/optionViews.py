@@ -1,5 +1,12 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QRadioButton, QLabel, QCheckBox
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import (
+    QWidget,
+    QPushButton,
+    QRadioButton,
+    QLabel,
+    QCheckBox,
+    QFileDialog
+)
+from PyQt5.QtCore import QCoreApplication, Qt
 
 from ..base import BaseWidget
 
@@ -125,8 +132,29 @@ class BrowserPath(BaseWidget):
         super().__init__(parent, title="ブラウザのパス設定")
         self.master = parent
 
-    def nextPage(self):
+        self.browser_path_str = QLabel(self)
+        self.browser_path_str.move(150, 200)
+        self.browser_path_str.setAlignment(Qt.AlignCenter)
+        self.browser_path_str.setFixedWidth(660)
+        self.browser_path_str.setText("選択なし")
+        self.browser_path_str.setStyleSheet(
+            "QLabel { font-size: 14px; border: 1px solid gray; border-radius: 5px; background-color: white; }")
+
+        self.select_btn = QPushButton('パスを選択する', self)
+        self.select_btn.move(430, 250)
+        self.select_btn.clicked.connect(self.showFileDialog)
+
         self.master.option["browserPath"] = None
+
+    def showFileDialog(self):
+        # 第二引数はダイアログのタイトル、第三引数は表示するパス
+        # path = QFileDialog.getOpenFileName(self, 'ブラウザの実行可能ファイル選択', '/home', filter="*.cjb")
+        path = QFileDialog.getOpenFileName(self, 'ブラウザの実行可能ファイル選択', '/home')
+        if path[0] != "":
+            self.master.option["browserPath"] = str(path[0])
+            self.browser_path_str.setText(path[0])
+
+    def nextPage(self):
 
         if self.master.option["target"] == "files":
             self.master.setCurrentIndex(

@@ -86,7 +86,7 @@ class RunChecker(QObject, metaclass=MyMeta):
 
         # ドライバーの設定
         self.driver.set_window_size(1000, 800)
-        self.driver.implicitly_wait(1)  # 各要素を取得する際に最大指定時間繰り返し探索する
+        self.driver.implicitly_wait(0.3)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
         self.driver.get(
             "https://haru1843.github.io/circuit-simulation-app/usage")

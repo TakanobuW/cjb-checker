@@ -139,7 +139,11 @@ class RunChecker4Work1(RunChecker):
         super().__init__(browserPath, file_path_list)
 
     def _checkFile(self, file_path: str) -> Dict:
-        result_dict = {}
+        result_dict = {
+            "workability": False,
+            "error-details": "",
+            "mapping": {}
+        }
         self.file_upload_button.send_keys(file_path)
 
         # .simcir-device も除く
@@ -150,11 +154,15 @@ class RunChecker4Work1(RunChecker):
         switches = circuit.find_elements_by_class_name(
             "simcir-basicset-switch")
 
-        if len(switches) != 3:
-            print("課題2です.")
-            return
-        else:
-            print("課題1です.")
+        # スイッチの数によるチェック
+        if len(switches) > 3:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチの数が3つより多い"
+            return result_dict
+        elif len(switches) < 3:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチの数が3つ未満"
+            return result_dict
 
         button_list = [switch.find_element_by_class_name(
             "simcir-basicset-switch-button") for switch in switches]
@@ -176,7 +184,10 @@ class RunChecker4Work1(RunChecker):
             if len(device.find_elements_by_class_name("simcir-node-type-in")) == 8:
                 target_idx = idx
                 break
-                # device.screenshot("7seg.png")
+        else:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "7segが見つからない"
+            return result_dict
 
         # 7segの状態取得
         seven_seg_node_list: List = device_list[target_idx].find_elements_by_class_name(
@@ -209,14 +220,48 @@ class RunChecker4Work1(RunChecker):
         mapping_btn2seg = {
             "{:d}{:d}{:d}".format(*btn_state): get_7seg_state(),
         }
-
         for click_btn_idx in click_btn_idx_list:
             btn_state[click_btn_idx] = (btn_state[click_btn_idx] + 1) % 2
             button_list[click_btn_idx].click()
             time.sleep(0.1)
             mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
 
-        return mapping_btn2seg
+        # スイッチの位置と7segの状態を確認し, 対応が正しいかの確認を行う
+        isOk, mapping_btn2seg = self._checkMappingBtn2Seg(mapping_btn2seg)
+
+        result_dict["workability"] = isOk
+        if not isOk:
+            result_dict["error-details"] = "スイッチと7segの表示対応が正しくない"
+        result_dict["mapping"] = mapping_btn2seg
+
+        return result_dict
+
+    def _checkMappingBtn2Seg(self, btn2seg) -> (bool, Dict[str, int]):
+        seg2digit = {
+            1: 0,
+            2: 1,
+            4: 2
+        }
+
+        def reorder(btn_state: str, order_list: List):
+            split_btn_state = [char for char in btn_state]
+            return "".join([split_btn_state[idx] for idx in order_list])
+
+        order_list = [-1] * 3
+        for btn_state in ["001", "010", "100"]:
+            digit = seg2digit.get(btn2seg[btn_state])
+            if digit is not None:
+                order_list[digit] = btn_state.index("1")
+            else:
+                return False, btn2seg
+
+        sorted_mapping = dict(sorted({reorder(btn_state, order_list[::-1]): seg_state for btn_state,
+                                      seg_state in btn2seg.items()}.items(), key=lambda x:  x[1]))
+
+        if list(sorted_mapping.values()) == list(range(8)):  # 正しい対応表
+            return True, sorted_mapping
+        else:  # 対応表がおかしい
+            return False, sorted_mapping
 
 
 class RunChecker4Work2(RunChecker):

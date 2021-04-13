@@ -50,7 +50,7 @@ class Log4File(LogBaseWidget):
 
     def saveFile(self):
         result_json = json.dumps(self.master.file_check_result, indent=2)
-        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_result_template.html'), mode="r") as fp:
+        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'file_result_template.html'), mode="r") as fp:
             output_html = \
                 fp.read() + \
                 f"<script>const run_result_json = `{result_json}`</script>"
@@ -65,7 +65,7 @@ class Log4File(LogBaseWidget):
             result = QMessageBox.question(None, "確認", "ファイルに保存せず次に進みますか？",
                                           QMessageBox.Yes, QMessageBox.No)
 
-        if self.file_saved or (result == QMessageBox.Ok):
+        if self.file_saved or (result == QMessageBox.Yes):
             if self.master.option["check"]["run"]:
                 self.master.setCurrentIndex(
                     self.master.tab_index_dict["log"]["run"]
@@ -82,7 +82,37 @@ class Log4Run(LogBaseWidget):
         self.master = parent
 
     def saveFile(self):
-        pass
+        subdir_name = "mapping"
+
+        relative_subpath_list = [os.path.join(".", subdir_name, f"{nth}.html")
+                                 for nth in range(len(self.master.run_check_result))]
+
+        main_result_json = json.dumps(
+            [{**r, "link": f"<a href=\'{p}\'>クリック</a>"}
+                for r, p in zip(self.master.run_check_result, relative_subpath_list)],
+            indent=2)
+        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'run_result_template.html'), mode="r") as fp:
+            output_html = \
+                fp.read() + \
+                f"<script>const run_result_json = `{main_result_json}`</script>"
+
+        open(os.path.join(self.save_path_str.text(), "run_result.html"), mode="w").write(output_html)
+        json.dump(
+            self.master.run_check_result,
+            open(os.path.join(self.save_path_str.text(), "run_result.json"), mode="w"),
+            indent=2
+        )
+
+        subdir_path = os.path.join(self.save_path_str.text(), subdir_name)
+        os.mkdir(subdir_path)
+        for relative_subpath, result in zip(relative_subpath_list, self.master.run_check_result):
+            # work1, work2 でそれぞれテンプレ作って, そこに突っ込む予定 !!!!!!!
+            output_html = ">>>" + f"{result['mapping']}" + "<<<"
+            open(os.path.join(subdir_path, os.path.basename(
+                relative_subpath)), mode="w").write(output_html)
+
+        self.file_saved = True
+        QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
 
     def nextPage(self):
         self.master.setCurrentIndex(

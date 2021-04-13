@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.css"
+    />
+    <script src="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.js"></script>
+    <script>
+      jQuery(function ($) {
+        const file_result_list = [];
+        const run_result_list = JSON.parse(run_result_json);
+
+        let table = $("#test-table").DataTable({
+          destroy: true,
+          data: run_result_list,
+          columns: [
+            { data: "fname" },
+            { data: "bytes" },
+            { data: "date" },
+            { data: "device_num" },
+            { data: "x_centre" },
+            { data: "y_centre" },
+          ],
+          displayLength: 100,
+          length: 100,
+          scrollX: true,
+          columnDefs: [
+            { targets: 0, width: 80 },
+            { targets: 1, width: 80 },
+            { targets: 2, width: 160 },
+            { targets: 3, width: 80 },
+            { targets: 4, width: 150 },
+            { targets: 5, width: 150 },
+          ],
+        });
+      });
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <table id="test-table" class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ファイル名</th>
+          <th>バイト数</th>
+          <th>作成日時</th>
+          <th>デバイス数</th>
+          <th>Xの重心</th>
+          <th>Yの重心</th>
+        </tr>
+      </thead>
+    </table>
+  </body>
+</html>
+<!-- <script>
+  const run_result_json =
+    '[{"fname": "t18b353f", "bytes": 5356, "date": "2020-1112-13:39:56:6977", "device_num": 31, "x_centre": 275.93548387096774, "y_centre": 423.2903225806452}, {"fname": "t18b208d", "bytes": 5660, "date": "2020-1112-15:31:03:3511", "device_num": 36, "x_centre": 309.72222222222223, "y_centre": 392.0}, {"fname": "t18b217c", "bytes": 5581, "date": "2020-1112-14:57:50:0473", "device_num": 32, "x_centre": 406.25, "y_centre": 208.0}, {"fname": "t18b220c", "bytes": 4823, "date": "2020-1112-14:51:41:1176", "device_num": 27, "x_centre": 341.9259259259259, "y_centre": 274.3703703703704}, {"fname": "t18b203c", "bytes": 6056, "date": "2020-1112-14:48:54:4738", "device_num": 35, "x_centre": 752.9714285714285, "y_centre": 470.22857142857146}, {"fname": "t18b205k", "bytes": 4792, "date": "2020-1105-15:04:51:1079", "device_num": 27, "x_centre": 276.962962962963, "y_centre": 276.0740740740741}, {"fname": "t18b228j", "bytes": 5411, "date": "2020-1112-15:11:13:3073", "device_num": 31, "x_centre": 422.7096774193548, "y_centre": 411.35483870967744}, {"fname": "t18b214j", "bytes": 4558, "date": "2020-1112-14:41:27:7900", "device_num": 27, "x_centre": 433.77777777777777, "y_centre": 367.7037037037037}, {"fname": "t18b212b", "bytes": 6504, "date": "2020-1112-14:54:13:3963", "device_num": 34, "x_centre": 279.29411764705884, "y_centre": 204.23529411764707}, {"fname": "t18b235a", "bytes": 6008, "date": "2020-1112-14:58:51:1120", "device_num": 35, "x_centre": 694.4, "y_centre": 511.54285714285714}, {"fname": "t18b225d", "bytes": 5760, "date": "2020-1107-22:14:20:0540", "device_num": 32, "x_centre": 508.0, "y_centre": 420.25}, {"fname": "t18b232g", "bytes": 4649, "date": "2020-1112-17:20:48:8333", "device_num": 26, "x_centre": 458.2307692307692, "y_centre": 252.3846153846154}, {"fname": "t18b243b", "bytes": 5245, "date": "2020-1112-15:30:33:3747", "device_num": 30, "x_centre": 310.6, "y_centre": 296.8666666666667}, {"fname": "t18b223h", "bytes": 4334, "date": "2020-1112-16:22:35:5375", "device_num": 24, "x_centre": 500.3333333333333, "y_centre": 532.6666666666666}, {"fname": "t16i282b", "bytes": 4369, "date": "2020-1116-22:06:31:1455", "device_num": 25, "x_centre": 453.04, "y_centre": 302.56}, {"fname": "t18b211d", "bytes": 5880, "date": "2020-1112-14:45:55:5710", "device_num": 34, "x_centre": 483.7647058823529, "y_centre": 440.2352941176471}, {"fname": "t18b219k", "bytes": 4876, "date": "2020-1112-12:55:20:0856", "device_num": 28, "x_centre": 640.9285714285714, "y_centre": 280.35714285714283}, {"fname": "t18b241f", "bytes": 5591, "date": "2020-1112-14:29:25:5923", "device_num": 32, "x_centre": 345.25, "y_centre": 481.5}, {"fname": "t17b211k", "bytes": 4980, "date": "2020-1110-12:43:29:9115", "device_num": 31, "x_centre": 559.6774193548387, "y_centre": 288.0}]';
+</script> -->

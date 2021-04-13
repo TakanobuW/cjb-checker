@@ -146,9 +146,9 @@ class RunChecker4Work1(RunChecker):
         }
         self.file_upload_button.send_keys(file_path)
 
-        # .simcir-device も除く
+        # circuitを囲んでいる<g>の取得
         circuit = self.driver.find_element_by_css_selector(
-            'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar)')
+            'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar, .simcir-device)')
 
         # スイッチの取得
         switches = circuit.find_elements_by_class_name(

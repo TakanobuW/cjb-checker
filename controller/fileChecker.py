@@ -3,6 +3,7 @@ import numpy as np
 import json
 import time
 from abc import ABC, ABCMeta, abstractmethod
+from typing import List, Dict
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -60,14 +61,18 @@ class MyMeta(ABCMeta, type(QObject)):
 
 
 class RunChecker(QObject, metaclass=MyMeta):
+    """
+    xxx
+    """
+
+    # threadからシグナルを飛ばすためのクラス変数(クラス変数じゃないとダメらしい)
     progressChanged = pyqtSignal(int)
     timeChanged = pyqtSignal(str)
-    checkEnd = pyqtSignal()
+    checkEnd = pyqtSignal(List)
 
     def __init__(self, browserPath, file_path_list):
         super().__init__()
 
-        self.result = []
         self.browserPath = browserPath
         self.file_path_list = file_path_list
 
@@ -92,10 +97,12 @@ class RunChecker(QObject, metaclass=MyMeta):
     def checkFiles(self):
         self._launchBrowser()
 
+        result_list = [{}] * len(self.file_path_list)
+
         start_time = time.time()
         time_str_fmt = "{:02d}m{:02d}s : {:02d}m{:02d}s"
         for nth, file_path in enumerate(self.file_path_list):
-            self._checkFile(file_path)
+            result_list[nth] = self._checkFile(file_path)
             self.progressChanged.emit(
                 ((nth + 1) / len(self.file_path_list)) * 100)
 
@@ -109,13 +116,13 @@ class RunChecker(QObject, metaclass=MyMeta):
                 remain_second // 60, remain_second % 60
             ))
 
-        self.checkEnd.emit()
+        self.checkEnd.emit(result_list)
 
         self.driver.close()
         self.driver.quit()
 
     @abstractmethod
-    def _checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str) -> Dict:
         pass
 
     def getResult(self):
@@ -130,7 +137,8 @@ class RunChecker4Work1(RunChecker):
     def __init__(self, browserPath, file_path_list):
         super().__init__(browserPath, file_path_list)
 
-    def _checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str) -> Dict:
+        result_dict = {}
         self.file_upload_button.send_keys(file_path)
 
         circuit = self.driver.find_element_by_css_selector(
@@ -148,6 +156,8 @@ class RunChecker4Work1(RunChecker):
         button_list = [switch.find_element_by_class_name(
             "simcir-basicset-switch-button") for switch in switches]
 
+        # !!!!!!!!!!!!!!!! ボタンの位置移動する !!!!!!!!!!!!!!!!!!! (translateを移動すればたぶんok)
+
         # 全部のボタンをオフにする
         for btn in button_list:
             if "simcir-basicset-switch-button-pressed" in btn.get_attribute("class"):
@@ -163,9 +173,13 @@ class RunChecker4Work1(RunChecker):
                 # device.screenshot("7seg.png")
 
         # 7segの状態取得
-        seven_seg_node_list = device_list[target_idx].find_elements_by_class_name(
+        seven_seg_node_list: List = device_list[target_idx].find_elements_by_class_name(
             "simcir-node-type-in")
 
+        # 7segのinput-nodeを昇順にソート
+        seven_seg_node_list.sort(key=lambda x: int(x.get_attribute("simcir-transform-y")))
+
+        # 7segの状態を取得する関数
         def get_7seg_state():
             segment_mapping_list = [
                 'ooooooxx',
@@ -178,24 +192,32 @@ class RunChecker4Work1(RunChecker):
                 'oooxxoxx',
             ]
 
-            # !!!!!!!!!!!!!!!!!input-node の順番のsort
             try:
                 return segment_mapping_list.index("".join(["o" if "simcir-node-hot" in node.get_attribute("class") else "x" for node in seven_seg_node_list]))
             except ValueError:
                 return -1
 
-        # ボタンをクリック(0->7)
-        print(get_7seg_state())
+        # ボタンをクリック(0->7), 7segの状態を取得
         click_btn_idx_list = [0, 1, 2, 1, 0, 1, 2]
+        btn_state = [0, 0, 0]
+        mapping_btn2seg = {
+            "{:d}{:d}{:d}".format(*btn_state): get_7seg_state(),
+        }
+
         for click_btn_idx in click_btn_idx_list:
+            btn_state[click_btn_idx] = (btn_state[click_btn_idx] + 1) % 2
             button_list[click_btn_idx].click()
             time.sleep(0.1)
-            print(get_7seg_state())
+            mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
+
+        print(mapping_btn2seg)
+
+        return mapping_btn2seg
 
 
 class RunChecker4Work2(RunChecker):
     def __init__(self, browserPath, file_path_list):
         super().__init__(browserPath, file_path_list)
 
-    def _checkFile(self, file_path: str):
+    def _checkFile(self, file_path: str) -> Dict:
         self.file_upload_button.send_keys(file_path)

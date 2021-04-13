@@ -1,6 +1,7 @@
 from ..base import BaseWidget
 import os
 import json
+from abc import abstractmethod
 
 from PyQt5.QtWidgets import QLabel, QPushButton, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt
@@ -30,17 +31,9 @@ class LogBaseWidget(BaseWidget):
 
         self.file_saved = False
 
+    @abstractmethod
     def saveFile(self):
-        result_json = json.dumps(self.master.file_check_result, indent=2)
-        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_result_template.html'), mode="r") as fp:
-            output_html = \
-                fp.read() + \
-                f"<script>const run_result_json = `{result_json}`</script>"
-
-        open(os.path.join(self.save_path_str.text(), "work1_result.html"), mode="w").write(output_html)
-        open(os.path.join(self.save_path_str.text(), "work1_result.json"), mode="w").write(result_json)
-        self.file_saved = True
-        QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
+        pass
 
     def showFileDialog(self):
         # 第二引数はダイアログのタイトル、第三引数は表示するパス
@@ -54,6 +47,18 @@ class Log4File(LogBaseWidget):
     def __init__(self, parent):
         super().__init__(parent, title="ファイル内容の結果の出力")
         self.master = parent
+
+    def saveFile(self):
+        result_json = json.dumps(self.master.file_check_result, indent=2)
+        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_result_template.html'), mode="r") as fp:
+            output_html = \
+                fp.read() + \
+                f"<script>const run_result_json = `{result_json}`</script>"
+
+        open(os.path.join(self.save_path_str.text(), "work1_result.html"), mode="w").write(output_html)
+        open(os.path.join(self.save_path_str.text(), "work1_result.json"), mode="w").write(result_json)
+        self.file_saved = True
+        QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
 
     def nextPage(self):
         if not self.file_saved:
@@ -75,6 +80,9 @@ class Log4Run(LogBaseWidget):
     def __init__(self, parent):
         super().__init__(parent, title="回路の実行結果の出力")
         self.master = parent
+
+    def saveFile(self):
+        pass
 
     def nextPage(self):
         self.master.setCurrentIndex(

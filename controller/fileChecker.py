@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -84,7 +85,7 @@ class RunChecker(QObject, metaclass=MyMeta):
             self.driver = webdriver.Chrome(self.browserPath)
 
         # ドライバーの設定
-        self.driver.set_window_size(800, 450)
+        self.driver.set_window_size(1000, 800)
         self.driver.implicitly_wait(1)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
         self.driver.get(
@@ -141,9 +142,11 @@ class RunChecker4Work1(RunChecker):
         result_dict = {}
         self.file_upload_button.send_keys(file_path)
 
+        # .simcir-device も除く
         circuit = self.driver.find_element_by_css_selector(
             'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar)')
 
+        # スイッチの取得
         switches = circuit.find_elements_by_class_name(
             "simcir-basicset-switch")
 
@@ -156,7 +159,10 @@ class RunChecker4Work1(RunChecker):
         button_list = [switch.find_element_by_class_name(
             "simcir-basicset-switch-button") for switch in switches]
 
-        # !!!!!!!!!!!!!!!! ボタンの位置移動する !!!!!!!!!!!!!!!!!!! (translateを移動すればたぶんok)
+        # スイッチの位置を移動する
+        self.driver.execute_script(
+            'document.querySelectorAll("g[simcir-transform-y=\'0\']:not(.simcir-scrollbar-bar, .simcir-scrollbar, .simcir-device) .simcir-basicset-switch").forEach(function(e, idx){e.setAttribute("transform", `translate(50 ${(idx + 1)*50})`)})'
+        )
 
         # 全部のボタンをオフにする
         for btn in button_list:
@@ -209,8 +215,6 @@ class RunChecker4Work1(RunChecker):
             button_list[click_btn_idx].click()
             time.sleep(0.1)
             mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
-
-        print(mapping_btn2seg)
 
         return mapping_btn2seg
 

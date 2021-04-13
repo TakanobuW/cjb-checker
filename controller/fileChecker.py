@@ -142,7 +142,8 @@ class RunChecker4Work1(RunChecker):
         result_dict = {
             "workability": False,
             "error-details": "",
-            "mapping": {}
+            "mapping": {},
+            "fname": os.path.basename(file_path).replace(".cjb", "")
         }
         self.file_upload_button.send_keys(file_path)
 

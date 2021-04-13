@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QMessageBox,
     QLabel,
-    QProgressBar
+    QProgressBar,
+    QAbstractItemView
 )
 from PyQt5.QtCore import QCoreApplication, Qt, QThread, pyqtSlot
 
@@ -104,11 +105,14 @@ class RunCheckProcessView(BaseWidget):
         self.table.setHorizontalHeaderLabels(keys)
         for nth, result in enumerate(result_list):
             for key_idx, key in enumerate(keys):
-                self.table.setItem(nth, key_idx, QTableWidgetItem(str(result[key])))
+                self.table.setItem(nth, key_idx, QTableWidgetItem(
+                    str(result[key])))
 
         self.table.move(50, 70)
         self.table.resize(860, 400)
         self.table.setSortingEnabled(True)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.show()
 
         if self.thread.isRunning():
             self.thread.terminate()

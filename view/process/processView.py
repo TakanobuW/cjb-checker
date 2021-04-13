@@ -46,6 +46,7 @@ class FileCheckProcessView(BaseWidget):
         self.table.move(50, 70)
         self.table.resize(860, 400)
         self.table.setSortingEnabled(True)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.show()
 
         self.enableNextButton()

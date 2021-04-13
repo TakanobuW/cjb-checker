@@ -112,6 +112,8 @@ class RunCheckProcessView(BaseWidget):
                 if not result["workability"]:
                     self.table.item(nth, key_idx).setBackground(QColor(245, 160, 157))
 
+        self.master.run_check_result = result_list
+
         self.table.move(50, 70)
         self.table.resize(860, 400)
         self.table.setSortingEnabled(True)

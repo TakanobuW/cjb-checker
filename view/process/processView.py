@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView
 )
 from PyQt5.QtCore import QCoreApplication, Qt, QThread, pyqtSlot
+from PyQt5.QtGui import QColor
 
 
 from ..base import BaseWidget
@@ -105,8 +106,9 @@ class RunCheckProcessView(BaseWidget):
         self.table.setHorizontalHeaderLabels(keys)
         for nth, result in enumerate(result_list):
             for key_idx, key in enumerate(keys):
-                self.table.setItem(nth, key_idx, QTableWidgetItem(
-                    str(result[key])))
+                self.table.setItem(nth, key_idx, QTableWidgetItem(str(result[key])))
+                if not result["workability"]:
+                    self.table.item(nth, key_idx).setBackground(QColor(245, 160, 157))
 
         self.table.move(50, 70)
         self.table.resize(860, 400)

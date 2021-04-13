@@ -101,7 +101,8 @@ class RunCheckProcessView(BaseWidget):
     def checkEndAction(self, result_list):
         self.enableNextButton()
 
-        keys = list(result_list[0].keys())
+        # keys = list(result_list[0].keys())
+        keys = ["fname", "workability", "error-details", "mapping"]
         self.table.setRowCount(len(result_list))
         self.table.setColumnCount(len(keys))
         self.table.setHorizontalHeaderLabels(keys)

@@ -69,7 +69,7 @@ class RunChecker(QObject, metaclass=MyMeta):
     # threadからシグナルを飛ばすためのクラス変数(クラス変数じゃないとダメらしい)
     progressChanged = pyqtSignal(int)
     timeChanged = pyqtSignal(str)
-    checkEnd = pyqtSignal(List)
+    checkEnd = pyqtSignal(list)
 
     def __init__(self, browserPath, file_path_list):
         super().__init__()
@@ -255,8 +255,9 @@ class RunChecker4Work1(RunChecker):
             else:
                 return False, btn2seg
 
+        # ボタン状態を桁順にならべ, ボタン状態でソートする
         sorted_mapping = dict(sorted({reorder(btn_state, order_list[::-1]): seg_state for btn_state,
-                                      seg_state in btn2seg.items()}.items(), key=lambda x:  x[1]))
+                                      seg_state in btn2seg.items()}.items(), key=lambda x:  x[0]))
 
         if list(sorted_mapping.values()) == list(range(8)):  # 正しい対応表
             return True, sorted_mapping

@@ -62,7 +62,7 @@ class Log4File(LogBaseWidget):
 
     def nextPage(self):
         if not self.file_saved:
-            result = QMessageBox.question(None, "確認", "ファイルに保存せず次に進みますか？",
+            result = QMessageBox.question(None, "確認", "ファイル内容のデコード結果をファイルに出力せずに進みますか？",
                                           QMessageBox.Yes, QMessageBox.No)
 
         if self.file_saved or (result == QMessageBox.Yes):

@@ -86,7 +86,7 @@ class RunChecker(QObject, metaclass=MyMeta):
 
         # ドライバーの設定
         self.driver.set_window_size(1000, 800)
-        self.driver.implicitly_wait(0.3)  # 各要素を取得する際に最大指定時間繰り返し探索する
+        self.driver.implicitly_wait(3.3)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
         self.driver.get(
             "https://haru1843.github.io/circuit-simulation-app/usage")
@@ -273,6 +273,13 @@ class RunChecker4Work2(RunChecker):
         super().__init__(browserPath, file_path_list)
 
     def _checkFile(self, file_path: str) -> Dict:
+        result_dict = {
+            "workability": False,
+            "error-details": "",
+            "mapping": {},
+            "fname": os.path.basename(file_path).replace(".cjb", "")
+        }
+
         self.file_upload_button.send_keys(file_path)
 
         # curcuitを囲んでいる<g>を取得
@@ -304,3 +311,59 @@ class RunChecker4Work2(RunChecker):
             result_dict["workability"] = False
             result_dict["error-details"] = "4bit7segが見つからない"
             return result_dict
+
+        # 4bit7segの状態取得
+        seven_seg_node_list: List = device_list[target_idx].find_elements_by_class_name(
+            "simcir-node-type-in")
+
+        # 対応表
+        seven_seg_table = [
+            'xxxx',
+            'oxxx',
+            'xoxx',
+            'ooxx',
+            'xxox',
+            'oxox',
+            'xoox',
+            'ooox',
+            'xxxo',
+            'oxxo',
+            'xoxo',
+            'ooxo',
+            'xxoo',
+            'oxoo',
+            'xooo',
+            'oooo',
+        ]
+
+        #
+        print(f">> in '{file_path}'")
+
+        time.sleep(0.1)
+
+        # スイッチ押す前の状態を出力
+
+        # スイッチを押す
+        for i in range(16):
+            ActionChains(self.driver).click_and_hold(switches[0]).perform()
+            time.sleep(0.1)
+            ActionChains(self.driver).release().perform()
+            time.sleep(0.1)
+
+            node_hot_list = ["-"]*len(seven_seg_node_list)
+            for idx, device_node in enumerate(seven_seg_node_list):
+                if "simcir-node-hot" in device_node.get_attribute("class"):
+                    node_hot_list[idx] = "o"
+                else:
+                    node_hot_list[idx] = "x"
+
+            seven_seg_bit = ''.join(node_hot_list)
+
+            if seven_seg_table.index(seven_seg_bit) != (i+1) % 16:
+                result_dict["workability"] = False
+                result_dict["error-details"] = "4bit7segが見つからない"
+                return result_dict
+
+        result_dict["workability"] = True
+
+        return result_dict

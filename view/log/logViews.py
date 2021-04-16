@@ -37,7 +37,8 @@ class LogBaseWidget(BaseWidget):
 
     def showFileDialog(self):
         # 第二引数はダイアログのタイトル、第三引数は表示するパス
-        path = str(QFileDialog.getExistingDirectory(self, '保存先フォルダの選択', '/home'))
+        path = str(QFileDialog.getExistingDirectory(
+            self, '保存先フォルダの選択', '/home'))
         if path != "":
             self.save_path_str.setText(path)
             self.save_btn.setEnabled(True)
@@ -50,13 +51,15 @@ class Log4File(LogBaseWidget):
 
     def saveFile(self):
         result_json = json.dumps(self.master.file_check_result, indent=2)
-        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'file_result_template.html'), mode="r") as fp:
+        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'file_result_template.html'), encoding="utf-8", mode="r") as fp:
             output_html = \
                 fp.read() + \
                 f"<script>const run_result_json = `{result_json}`</script>"
 
-        open(os.path.join(self.save_path_str.text(), "work1_result.html"), mode="w").write(output_html)
-        open(os.path.join(self.save_path_str.text(), "work1_result.json"), mode="w").write(result_json)
+        open(os.path.join(self.save_path_str.text(), "work1_result.html"),
+             encoding="utf-8", mode="w").write(output_html)
+        open(os.path.join(self.save_path_str.text(), "work1_result.json"),
+             encoding="utf-8", mode="w").write(result_json)
         self.file_saved = True
         QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
 
@@ -91,15 +94,17 @@ class Log4Run(LogBaseWidget):
             [{**r, "link": f"<a href=\'{p}\'>クリック</a>"}
                 for r, p in zip(self.master.run_check_result, relative_subpath_list)],
             indent=2)
-        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'run_result_template.html'), mode="r") as fp:
+        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'run_result_template.html'), encoding="utf-8", mode="r") as fp:
             output_html = \
                 fp.read() + \
                 f"<script>const run_result_json = `{main_result_json}`</script>"
 
-        open(os.path.join(self.save_path_str.text(), "run_result.html"), mode="w").write(output_html)
+        open(os.path.join(self.save_path_str.text(), "run_result.html"),
+             encoding="utf-8", mode="w").write(output_html)
         json.dump(
             self.master.run_check_result,
-            open(os.path.join(self.save_path_str.text(), "run_result.json"), mode="w"),
+            open(os.path.join(self.save_path_str.text(),
+                 "run_result.json"), encoding="utf-8", mode="w"),
             indent=2
         )
 
@@ -109,7 +114,7 @@ class Log4Run(LogBaseWidget):
             # work1, work2 でそれぞれテンプレ作って, そこに突っ込む予定 !!!!!!!
             output_html = ">>>" + f"{result['mapping']}" + "<<<"
             open(os.path.join(subdir_path, os.path.basename(
-                relative_subpath)), mode="w").write(output_html)
+                relative_subpath)), encoding="utf-8", mode="w").write(output_html)
 
         self.file_saved = True
         QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)

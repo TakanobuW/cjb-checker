@@ -71,22 +71,24 @@ class RunChecker(QObject, metaclass=MyMeta):
     timeChanged = pyqtSignal(str)
     checkEnd = pyqtSignal(list)
 
-    def __init__(self, browserPath, file_path_list):
+    def __init__(self, browser_path, file_path_list, implicitly_wait_time, click_wait_time):
         super().__init__()
 
-        self.browserPath = browserPath
+        self.browser_path = browser_path
         self.file_path_list = file_path_list
+        self.implicitly_wait_time = implicitly_wait_time
+        self.click_wait_time = click_wait_time
 
     def _launchBrowser(self):
         # self.driver = webdriver.Chrome("/usr/bin/chromedriver")
-        if self.browserPath is None:
+        if self.browser_path is None:
             self.driver = webdriver.Chrome()
         else:
-            self.driver = webdriver.Chrome(self.browserPath)
+            self.driver = webdriver.Chrome(self.browser_path)
 
         # ドライバーの設定
-        self.driver.set_window_size(1000, 800)
-        self.driver.implicitly_wait(0.3)  # 各要素を取得する際に最大指定時間繰り返し探索する
+        self.driver.set_window_size(1200, 800)
+        self.driver.implicitly_wait(self.implicitly_wait_time)  # 各要素を取得する際に最大指定時間繰り返し探索する
 
         self.driver.get(
             "https://haru1843.github.io/circuit-simulation-app/usage")
@@ -135,8 +137,8 @@ class RunChecker(QObject, metaclass=MyMeta):
 
 
 class RunChecker4Work1(RunChecker):
-    def __init__(self, browserPath, file_path_list):
-        super().__init__(browserPath, file_path_list)
+    def __init__(self, browser_path, file_path_list, implicitly_wait_time, click_wait_time):
+        super().__init__(browser_path, file_path_list, implicitly_wait_time, click_wait_time)
 
     def _checkFile(self, file_path: str) -> Dict:
         result_dict = {
@@ -224,7 +226,7 @@ class RunChecker4Work1(RunChecker):
         for click_btn_idx in click_btn_idx_list:
             btn_state[click_btn_idx] = (btn_state[click_btn_idx] + 1) % 2
             button_list[click_btn_idx].click()
-            time.sleep(0.1)
+            time.sleep(self.click_wait_time)
             mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
 
         # スイッチの位置と7segの状態を確認し, 対応が正しいかの確認を行う
@@ -267,8 +269,8 @@ class RunChecker4Work1(RunChecker):
 
 
 class RunChecker4Work2(RunChecker):
-    def __init__(self, browserPath, file_path_list):
-        super().__init__(browserPath, file_path_list)
+    def __init__(self, browser_path, file_path_list, implicitly_wait_time, click_wait_time):
+        super().__init__(browser_path, file_path_list, implicitly_wait_time, click_wait_time)
 
     def _checkFile(self, file_path: str) -> Dict:
         self.file_upload_button.send_keys(file_path)

@@ -129,17 +129,26 @@ class RunCheckProcessView(BaseWidget):
         # チェックする課題に応じてインスタンスを生成
         if self.master.option["check"]["run-target"] == "work1":
             self.checker = RunChecker4Work1(
-                browserPath=self.master.option["browserPath"],
-                file_path_list=self.master.file_path_list)
+                browser_path=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list,
+                implicitly_wait_time=self.master.option["runtime"]["implicitly_wait"],
+                click_wait_time=self.master.option["runtime"]["click_wait"]
+            )
         elif self.master.option["check"]["run-target"] == "work2":
             self.checker = RunChecker4Work2(
-                browserPath=self.master.option["browserPath"],
-                file_path_list=self.master.file_path_list)
+                browser_path=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list,
+                implicitly_wait_time=self.master.option["runtime"]["implicitly_wait"],
+                click_wait_time=self.master.option["runtime"]["click_wait"]
+            )
         else:
             print("Unecpected behavior in process-run")
             self.checker = RunChecker4Work1(
-                browserPath=self.master.option["browserPath"],
-                file_path_list=self.master.file_path_list)
+                browser_path=self.master.option["browserPath"],
+                file_path_list=self.master.file_path_list,
+                implicitly_wait_time=self.master.option["runtime"]["implicitly_wait"],
+                click_wait_time=self.master.option["runtime"]["click_wait"]
+            )
 
         # メインの方の描画更新がとまってしまうため,
         # インスタンスをスレッド化し, 別スレッドにて実行

@@ -49,7 +49,7 @@ class Runtime(BaseWidget):
         self.search_wait_time.move(175, 180)
         self.search_wait_time.setValidator(QDoubleValidator(
             0.01, 3.00, 2, notation=QDoubleValidator.StandardNotation))
-        self.search_wait_time.setText("0.3")
+        self.search_wait_time.setText("0.2")
         self.search_label = QLabel(self)
         self.search_label.setText("各要素探索にかける時間(秒)")
         self.search_label.move(175, 160)

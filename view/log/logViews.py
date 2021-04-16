@@ -113,14 +113,14 @@ class Log4Run(LogBaseWidget):
 
         # チェックする課題に応じて読み込むテンプレートを変える
         if self.master.option["check"]["run-target"] == "work1":
-            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), mode="r") as fp:
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), encoding="utf-8", mode="r") as fp:
                 output_html = fp.read()
         elif self.master.option["check"]["run-target"] == "work2":
-            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work2_mapping_template.html'), mode="r") as fp:
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work2_mapping_template.html'), encoding="utf-8", mode="r") as fp:
                 output_html = fp.read()
         else:
             print("Unecpected behavior in log-run")
-            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), mode="r") as fp:
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), encoding="utf-8", mode="r") as fp:
                 output_html = fp.read()
 
         for relative_subpath, result in zip(relative_subpath_list, self.master.run_check_result):

@@ -55,8 +55,8 @@ class Log4File(LogBaseWidget):
                 fp.read() + \
                 f"<script>const run_result_json = `{result_json}`</script>"
 
-        open(os.path.join(self.save_path_str.text(), "work1_result.html"), mode="w").write(output_html)
-        open(os.path.join(self.save_path_str.text(), "work1_result.json"), mode="w").write(result_json)
+        open(os.path.join(self.save_path_str.text(), "file_result.html"), mode="w").write(output_html)
+        open(os.path.join(self.save_path_str.text(), "file_result.json"), mode="w").write(result_json)
         self.file_saved = True
         QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
 

@@ -104,12 +104,28 @@ class Log4Run(LogBaseWidget):
         )
 
         subdir_path = os.path.join(self.save_path_str.text(), subdir_name)
+        # os.makedirs(subdir_path, exist_ok=True)
         os.mkdir(subdir_path)
+
+        # チェックする課題に応じて読み込むテンプレートを変える
+        if self.master.option["check"]["run-target"] == "work1":
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), mode="r") as fp:
+                output_html = fp.read()
+        elif self.master.option["check"]["run-target"] == "work2":
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work2_mapping_template.html'), mode="r") as fp:
+                output_html = fp.read()
+        else:
+            print("Unecpected behavior in log-run")
+            with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'work1_mapping_template.html'), mode="r") as fp:
+                output_html = fp.read()
+
         for relative_subpath, result in zip(relative_subpath_list, self.master.run_check_result):
-            # work1, work2 でそれぞれテンプレ作って, そこに突っ込む予定 !!!!!!!
-            output_html = ">>>" + f"{result['mapping']}" + "<<<"
+            result_json = json.dumps([{"switch-state": k, "segment-state": v}
+                                      for k, v in result['mapping'].items()])
             open(os.path.join(subdir_path, os.path.basename(
-                relative_subpath)), mode="w").write(output_html)
+                relative_subpath)), mode="w").write(
+                    output_html + f"<script>const run_result_json = `{result_json}`</script>"
+            )
 
         self.file_saved = True
         QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)

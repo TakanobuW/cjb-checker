@@ -90,9 +90,13 @@ class Log4Run(LogBaseWidget):
         relative_subpath_list = [os.path.join(".", subdir_name, f"{nth}.html")
                                  for nth in range(len(self.master.run_check_result))]
 
+        # windows だと aタグに不適切なファイルパスになるため,,,,
+        a_tag_href_list = [
+            "/".join([".", subdir_name, f"{nth}.html"]) for nth in range(len(self.master.run_check_result))]
+
         main_result_json = json.dumps(
             [{**r, "link": f"<a href=\'{p}\'>クリック</a>"}
-                for r, p in zip(self.master.run_check_result, relative_subpath_list)],
+                for r, p in zip(self.master.run_check_result, a_tag_href_list)],
             indent=2)
         with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'template', 'run_result_template.html'), encoding="utf-8", mode="r") as fp:
             output_html = \

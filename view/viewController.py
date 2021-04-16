@@ -30,7 +30,8 @@ class App(QTabWidget):
         self.run_check_result = []
 
         # 各ページのインスタンス化
-        self.tab0 = optionViews.Target(self)
+        self.tab0 = optionViews.WholeOption(self)
+        # self.tab0 = optionViews.Target(self)
         self.tab1 = optionViews.Runtime(self)
         self.tab2 = optionViews.Check(self)
         self.tab3 = optionViews.BrowserPath(self)
@@ -47,7 +48,8 @@ class App(QTabWidget):
         self.tab10 = endView.End(self)
 
         # タブに各ページを追加
-        self.addTab(self.tab0, "option-target")
+        self.addTab(self.tab0, "option-whole")
+        # self.addTab(self.tab0, "option-target")
         self.addTab(self.tab1, "option-runtime")
         self.addTab(self.tab2, "option-check")
         self.addTab(self.tab3, "option-browserPath")

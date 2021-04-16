@@ -16,7 +16,7 @@ class BaseWidget(QWidget, metaclass=MyMeta):
 
         # ページ遷移用の「次へ」ボタン
         self.next_button = QPushButton('次へ', self)
-        self.next_button.move(745, 495)
+        self.next_button.move(850, 502)
         self.next_button.clicked.connect(self.nextPage)
 
         # ページタイトル

@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 from PyQt5.QtWidgets import (
     QWidget,
     QPushButton,
@@ -6,12 +7,52 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QFileDialog,
     QLineEdit,
-    QMessageBox
+    QMessageBox,
+    QGroupBox
 )
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QDoubleValidator
 
 from ..base import BaseWidget
+
+
+class MyMeta(ABCMeta, type(QWidget)):
+    pass
+
+
+class OptionPartWidget(QWidget, metaclass=MyMeta):
+    def __init__(self, parent, title):
+        super().__init__(parent)
+        self.master = parent
+
+        self.resize(480, 210)
+
+        self.group_box = QGroupBox(self)
+        self.group_box.resize(465, 204)
+
+        # 説明用のラベル
+        self.desc_msg = QLabel(self)
+
+        # アラート用のラベル
+        self.alert_msg = QLabel(self)
+
+
+class WholeOption(BaseWidget):
+    def __init__(self, parent):
+        super().__init__(parent, title="各種設定の変更")
+        self.master = parent
+
+        self.option_target = OptionPartWidget(self, "選択方法の設定")
+        self.option_target.move(0 + 10, 75 + 4)
+        self.option_runtime = OptionPartWidget(self, "実行時の設定")
+        self.option_runtime.move(480 + 5, 75 + 4)
+        self.option_target = OptionPartWidget(self, "確認項目の設定")
+        self.option_target.move(0 + 10, 285 + 2)
+        self.option_runtime = OptionPartWidget(self, "ブラウザパスの設定")
+        self.option_runtime.move(480 + 5, 285 + 2)
+
+    def nextPage(self):
+        pass
 
 
 class Target(BaseWidget):

@@ -14,20 +14,13 @@
         let table = $("#test-table").DataTable({
           destroy: true,
           data: run_result_list,
-          columns: [
-            { data: "fname" },
-            { data: "workability" },
-            { data: "error-details" },
-            { data: "link" },
-          ],
+          columns: [{ data: "switch-state" }, { data: "segment-state" }],
           displayLength: 100,
           length: 100,
           scrollX: true,
           columnDefs: [
             { targets: 0, width: 120 },
-            { targets: 1, width: 80 },
-            { targets: 2, width: 200 },
-            { targets: 3, width: 80 },
+            { targets: 1, width: 120 },
           ],
         });
       });
@@ -38,10 +31,8 @@
     <table id="test-table" class="table table-bordered">
       <thead>
         <tr>
-          <th>ファイル名</th>
-          <th>適切な動作</th>
-          <th>エラー詳細</th>
-          <th>対応表を見る</th>
+          <th>クリック回数</th>
+          <th>セグメントの状態</th>
         </tr>
       </thead>
     </table>

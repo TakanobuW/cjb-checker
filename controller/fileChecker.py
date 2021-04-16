@@ -88,7 +88,8 @@ class RunChecker(QObject, metaclass=MyMeta):
 
         # ドライバーの設定
         self.driver.set_window_size(1200, 800)
-        self.driver.implicitly_wait(self.implicitly_wait_time)  # 各要素を取得する際に最大指定時間繰り返し探索する
+        # 各要素を取得する際に最大指定時間繰り返し探索する
+        self.driver.implicitly_wait(self.implicitly_wait_time)
 
         self.driver.get(
             "https://haru1843.github.io/circuit-simulation-app/usage")
@@ -138,7 +139,8 @@ class RunChecker(QObject, metaclass=MyMeta):
 
 class RunChecker4Work1(RunChecker):
     def __init__(self, browser_path, file_path_list, implicitly_wait_time, click_wait_time):
-        super().__init__(browser_path, file_path_list, implicitly_wait_time, click_wait_time)
+        super().__init__(browser_path, file_path_list,
+                         implicitly_wait_time, click_wait_time)
 
     def _checkFile(self, file_path: str) -> Dict:
         result_dict = {
@@ -197,7 +199,8 @@ class RunChecker4Work1(RunChecker):
             "simcir-node-type-in")
 
         # 7segのinput-nodeを昇順にソート
-        seven_seg_node_list.sort(key=lambda x: int(x.get_attribute("simcir-transform-y")))
+        seven_seg_node_list.sort(key=lambda x: int(
+            x.get_attribute("simcir-transform-y")))
 
         # 7segの状態を取得する関数
         def get_7seg_state():
@@ -227,7 +230,8 @@ class RunChecker4Work1(RunChecker):
             btn_state[click_btn_idx] = (btn_state[click_btn_idx] + 1) % 2
             button_list[click_btn_idx].click()
             time.sleep(self.click_wait_time)
-            mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
+            mapping_btn2seg["{:d}{:d}{:d}".format(
+                *btn_state)] = get_7seg_state()
 
         # スイッチの位置と7segの状態を確認し, 対応が正しいかの確認を行う
         isOk, mapping_btn2seg = self._checkMappingBtn2Seg(mapping_btn2seg)
@@ -270,7 +274,90 @@ class RunChecker4Work1(RunChecker):
 
 class RunChecker4Work2(RunChecker):
     def __init__(self, browser_path, file_path_list, implicitly_wait_time, click_wait_time):
-        super().__init__(browser_path, file_path_list, implicitly_wait_time, click_wait_time)
+        super().__init__(browser_path, file_path_list,
+                         implicitly_wait_time, click_wait_time)
 
     def _checkFile(self, file_path: str) -> Dict:
+        result_dict = {
+            "workability": False,
+            "error-details": "",
+            "mapping": {},
+            "fname": os.path.basename(file_path).replace(".cjb", "")
+        }
+
         self.file_upload_button.send_keys(file_path)
+
+        # curcuitを囲んでいる<g>を取得
+        circuit = self.driver.find_element_by_css_selector(
+            'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar, .simcir-device)')
+
+        # スイッチを取得
+        switches = circuit.find_elements_by_class_name(
+            "simcir-basicset-switch-button")
+
+        # スイッチの数によるチェック
+        if len(switches) > 1:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチの数が1つより多い"
+            return result_dict
+        elif len(switches) < 1:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチなし"
+            return result_dict
+
+        # 4bit7segを取得
+        device_list = circuit.find_elements_by_class_name("simcir-device")
+        target_idx = 0
+        for idx, device in enumerate(device_list):
+            if len(device.find_elements_by_class_name("simcir-node-type-in")) == 4:
+                target_idx = idx
+                break
+        else:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "4bit7segが見つからない"
+            return result_dict
+
+        # 4bit7segの状態から10進数をデコード
+        def decode_4bit7seg(seven_seg_node_list):
+            node_hot_list = ["-"]*len(seven_seg_node_list)
+            for idx, device_node in enumerate(seven_seg_node_list):
+                if "simcir-node-hot" in device_node.get_attribute("class"):
+                    node_hot_list[idx] = "1"
+                else:
+                    node_hot_list[idx] = "0"
+
+            return int(''.join(node_hot_list[::-1]), 2)
+
+        # 4bit7segの状態取得
+        seven_seg_node_list: List = device_list[target_idx].find_elements_by_class_name(
+            "simcir-node-type-in")
+
+        cycle_size = 16
+        seg_sequence = [-1]*(cycle_size+1)
+
+        # スイッチ押す前の状態を出力
+        time.sleep(0.1)
+        seg_sequence[0] = decode_4bit7seg(seven_seg_node_list)
+
+        # スイッチを押す
+        for i in range(cycle_size):
+            ActionChains(self.driver).click_and_hold(switches[0]).perform()
+            time.sleep(0.1)
+            ActionChains(self.driver).release().perform()
+            time.sleep(0.1)
+
+            seg_sequence[i+1] = decode_4bit7seg(seven_seg_node_list)
+
+        correct_sequence = list(map(lambda x: x % cycle_size, range(
+            seg_sequence[0], seg_sequence[0]+cycle_size)))+[seg_sequence[0]]
+
+        if seg_sequence != correct_sequence:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "4bit7segが見つからない"
+        else:
+            result_dict["workability"] = True
+
+        result_dict["mapping"] = {
+            idx: seg_num for idx, seg_num in enumerate(seg_sequence)}
+
+        return result_dict

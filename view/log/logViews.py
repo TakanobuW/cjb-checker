@@ -130,6 +130,11 @@ class Log4Run(LogBaseWidget):
         QMessageBox.information(None, "通知", "ファイルの保存が完了しました.", QMessageBox.Ok)
 
     def nextPage(self):
-        self.master.setCurrentIndex(
-            self.master.tab_index_dict["end"]
-        )
+        if not self.file_saved:
+            result = QMessageBox.question(None, "確認", "回路の実行結果をファイルに出力せずに進みますか?",
+                                          QMessageBox.Yes, QMessageBox.No)
+
+        if self.file_saved or (result == QMessageBox.Yes):
+            self.master.setCurrentIndex(
+                self.master.tab_index_dict["end"]
+            )

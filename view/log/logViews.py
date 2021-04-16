@@ -104,8 +104,7 @@ class Log4Run(LogBaseWidget):
         )
 
         subdir_path = os.path.join(self.save_path_str.text(), subdir_name)
-        # os.makedirs(subdir_path, exist_ok=True)
-        os.mkdir(subdir_path)
+        os.makedirs(subdir_path, exist_ok=True)
 
         # チェックする課題に応じて読み込むテンプレートを変える
         if self.master.option["check"]["run-target"] == "work1":

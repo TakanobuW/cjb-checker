@@ -312,58 +312,47 @@ class RunChecker4Work2(RunChecker):
             result_dict["error-details"] = "4bit7segが見つからない"
             return result_dict
 
+        # 4bit7segの状態から10進数をデコード
+        def decode_4bit7seg(seven_seg_node_list):
+            node_hot_list = ["-"]*len(seven_seg_node_list)
+            for idx, device_node in enumerate(seven_seg_node_list):
+                if "simcir-node-hot" in device_node.get_attribute("class"):
+                    node_hot_list[idx] = "1"
+                else:
+                    node_hot_list[idx] = "0"
+
+            return int(''.join(node_hot_list[::-1]), 2)
+
         # 4bit7segの状態取得
         seven_seg_node_list: List = device_list[target_idx].find_elements_by_class_name(
             "simcir-node-type-in")
 
-        # 対応表
-        seven_seg_table = [
-            'xxxx',
-            'oxxx',
-            'xoxx',
-            'ooxx',
-            'xxox',
-            'oxox',
-            'xoox',
-            'ooox',
-            'xxxo',
-            'oxxo',
-            'xoxo',
-            'ooxo',
-            'xxoo',
-            'oxoo',
-            'xooo',
-            'oooo',
-        ]
-
-        #
-        print(f">> in '{file_path}'")
-
-        time.sleep(0.1)
+        cycle_size = 16
+        seg_sequence = [-1]*(cycle_size+1)
 
         # スイッチ押す前の状態を出力
+        time.sleep(0.1)
+        seg_sequence[0] = decode_4bit7seg(seven_seg_node_list)
 
         # スイッチを押す
-        for i in range(16):
+        for i in range(cycle_size):
             ActionChains(self.driver).click_and_hold(switches[0]).perform()
             time.sleep(0.1)
             ActionChains(self.driver).release().perform()
             time.sleep(0.1)
 
-            node_hot_list = ["-"]*len(seven_seg_node_list)
-            for idx, device_node in enumerate(seven_seg_node_list):
-                if "simcir-node-hot" in device_node.get_attribute("class"):
-                    node_hot_list[idx] = "o"
-                else:
-                    node_hot_list[idx] = "x"
+            seg_sequence[i+1] = decode_4bit7seg(seven_seg_node_list)
 
-            seven_seg_bit = ''.join(node_hot_list)
+        correct_sequence = list(map(lambda x: x % cycle_size, range(
+            seg_sequence[0], seg_sequence[0]+cycle_size)))+[seg_sequence[0]]
 
-            if seven_seg_table.index(seven_seg_bit) != (i+1) % 16:
-                result_dict["workability"] = False
-                result_dict["error-details"] = "4bit7segが見つからない"
-                return result_dict
+        if seg_sequence != correct_sequence:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "4bit7segが見つからない"
+        else:
+            result_dict["workability"] = True
 
-        result_dict["workability"] = True
+        result_dict["mapping"] = {
+            idx: seg_num for idx, seg_num in enumerate(seg_sequence)}
 
         return result_dict

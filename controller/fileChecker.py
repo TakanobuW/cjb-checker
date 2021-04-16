@@ -279,6 +279,28 @@ class RunChecker4Work2(RunChecker):
         circuit = self.driver.find_element_by_css_selector(
             'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar, .simcir-device)')
 
-        # スイッチを取得 (複数のスイッチを考慮するように書く)
-        switch = circuit.find_element_by_class_name(
+        # スイッチを取得
+        switches = circuit.find_elements_by_class_name(
             "simcir-basicset-switch-button")
+
+        # スイッチの数によるチェック
+        if len(switches) > 1:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチの数が1つより多い"
+            return result_dict
+        elif len(switches) < 1:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "スイッチなし"
+            return result_dict
+
+        # 4bit7segを取得
+        device_list = circuit.find_elements_by_class_name("simcir-device")
+        target_idx = 0
+        for idx, device in enumerate(device_list):
+            if len(device.find_elements_by_class_name("simcir-node-type-in")) == 4:
+                target_idx = idx
+                break
+        else:
+            result_dict["workability"] = False
+            result_dict["error-details"] = "4bit7segが見つからない"
+            return result_dict

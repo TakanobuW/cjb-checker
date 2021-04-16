@@ -19,12 +19,6 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         self.next_button.move(745, 495)
         self.next_button.clicked.connect(self.nextPage)
 
-        # ページタイトル用の帯的な
-        # painter = QPainter(self)
-        # painter.setPen()
-        # painter.setBrush()
-        # painter.drawRect(0, 0, 100, 540)
-
         # ページタイトル
         title_css = "QLabel { font-size: 30px }"
         title_pos = [20, 20]
@@ -33,6 +27,10 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         self.title.setStyleSheet(title_css)
 
     def paintEvent(self, event):
+        """
+        paintEventをオーバーライド
+        """
+        # ページタイトル用の帯的な
         painter = QPainter(self)
         painter.setPen(QColor(220, 220, 220))
         painter.setBrush(QColor(220, 220, 220))

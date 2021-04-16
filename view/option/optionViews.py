@@ -4,9 +4,12 @@ from PyQt5.QtWidgets import (
     QRadioButton,
     QLabel,
     QCheckBox,
-    QFileDialog
+    QFileDialog,
+    QLineEdit,
+    QMessageBox
 )
 from PyQt5.QtCore import QCoreApplication, Qt
+from PyQt5.QtGui import QDoubleValidator
 
 from ..base import BaseWidget
 
@@ -42,26 +45,35 @@ class Runtime(BaseWidget):
         super().__init__(parent, title="実行時の設定")
         self.master = parent
 
-        self.rbtn_speed = QRadioButton("速度重視", self)
-        self.rbtn_speed.move(175, 180)
-        self.rbtn_accurate = QRadioButton("正確さ重視", self)
-        self.rbtn_accurate.move(175, 310)
+        self.search_wait_time = QLineEdit(self)
+        self.search_wait_time.move(175, 180)
+        self.search_wait_time.setValidator(QDoubleValidator(
+            0.01, 3.00, 2, notation=QDoubleValidator.StandardNotation))
+        self.search_wait_time.setText("0.3")
+        self.search_label = QLabel(self)
+        self.search_label.setText("各要素探索にかける時間(秒)")
+        self.search_label.move(175, 160)
 
-        self.rbtn_accurate.setChecked(True)
+        self.click_wait_time = QLineEdit(self)
+        self.click_wait_time.move(175, 310)
+        self.click_wait_time.setValidator(QDoubleValidator(0.01, 3.00, 2))
+        self.click_wait_time.setText("0.1")
+        self.click_label = QLabel(self)
+        self.click_label.setText("要素をクリック後の待機時間(秒)")
+        self.click_label.move(175, 290)
 
     def nextPage(self):
-
-        if self.rbtn_speed.isChecked():
-            self.master.option["runtime"] = "speed"
-        elif self.rbtn_accurate.isChecked():
-            self.master.option["runtime"] = "accurate"
+        try:
+            self.master.option["runtime"] = {
+                "implicitly_wait": float(self.search_wait_time.text()),
+                "click_wait": float(self.click_wait_time.text())
+            }
+        except ValueError:
+            QMessageBox.warning(None, "ValueError!", "数値を入力してください.", QMessageBox.Yes)
         else:
-            print("Unecpected behavior in option-runtime")
-            self.master.option["runtime"] = "accurate"
-
-        self.master.setCurrentIndex(
-            self.master.currentIndex() + 1
-        )
+            self.master.setCurrentIndex(
+                self.master.currentIndex() + 1
+            )
 
 
 class Check(BaseWidget):

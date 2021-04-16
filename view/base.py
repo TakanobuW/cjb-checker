@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
+from PyQt5.QtGui import QPainter, QColor
+# from PyQt5.QtCore import Qt
 # from PyQt5.QtCore import QCoreApplication
 
 
@@ -12,16 +14,29 @@ class BaseWidget(QWidget, metaclass=MyMeta):
         super().__init__(parent)
         self.master = parent
 
+        # ページ遷移用の「次へ」ボタン
         self.next_button = QPushButton('次へ', self)
         self.next_button.move(745, 495)
         self.next_button.clicked.connect(self.nextPage)
 
-        title_css = "QLabel { font-size: 30px }"
-        title_pos = [30, 30]
+        # ページタイトル用の帯的な
+        # painter = QPainter(self)
+        # painter.setPen()
+        # painter.setBrush()
+        # painter.drawRect(0, 0, 100, 540)
 
+        # ページタイトル
+        title_css = "QLabel { font-size: 30px }"
+        title_pos = [20, 20]
         self.title = QLabel(title, self)
         self.title.move(*title_pos)
         self.title.setStyleSheet(title_css)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setPen(QColor(220, 220, 220))
+        painter.setBrush(QColor(220, 220, 220))
+        painter.drawRect(0, 0, 960, 75)
 
     def disableNextButton(self):
         self.next_button.setEnabled(False)

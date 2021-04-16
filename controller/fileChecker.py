@@ -195,7 +195,8 @@ class RunChecker4Work1(RunChecker):
             "simcir-node-type-in")
 
         # 7segのinput-nodeを昇順にソート
-        seven_seg_node_list.sort(key=lambda x: int(x.get_attribute("simcir-transform-y")))
+        seven_seg_node_list.sort(key=lambda x: int(
+            x.get_attribute("simcir-transform-y")))
 
         # 7segの状態を取得する関数
         def get_7seg_state():
@@ -225,7 +226,8 @@ class RunChecker4Work1(RunChecker):
             btn_state[click_btn_idx] = (btn_state[click_btn_idx] + 1) % 2
             button_list[click_btn_idx].click()
             time.sleep(0.1)
-            mapping_btn2seg["{:d}{:d}{:d}".format(*btn_state)] = get_7seg_state()
+            mapping_btn2seg["{:d}{:d}{:d}".format(
+                *btn_state)] = get_7seg_state()
 
         # スイッチの位置と7segの状態を確認し, 対応が正しいかの確認を行う
         isOk, mapping_btn2seg = self._checkMappingBtn2Seg(mapping_btn2seg)
@@ -272,3 +274,11 @@ class RunChecker4Work2(RunChecker):
 
     def _checkFile(self, file_path: str) -> Dict:
         self.file_upload_button.send_keys(file_path)
+
+        # curcuitを囲んでいる<g>を取得
+        circuit = self.driver.find_element_by_css_selector(
+            'g[simcir-transform-y="0"]:not(.simcir-scrollbar-bar, .simcir-scrollbar, .simcir-device)')
+
+        # スイッチを取得 (複数のスイッチを考慮するように書く)
+        switch = circuit.find_element_by_class_name(
+            "simcir-basicset-switch-button")

@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+
 from PyQt5.QtWidgets import (
     QWidget,
     QPushButton,
@@ -8,7 +9,8 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QLineEdit,
     QMessageBox,
-    QGroupBox
+    QGroupBox,
+    QVBoxLayout
 )
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QDoubleValidator
@@ -21,20 +23,192 @@ class MyMeta(ABCMeta, type(QWidget)):
 
 
 class OptionPartWidget(QWidget, metaclass=MyMeta):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, desc):
         super().__init__(parent)
         self.master = parent
 
         self.resize(480, 210)
 
+        self.vbox = QVBoxLayout()
+
         self.group_box = QGroupBox(self)
+        self.group_box.setTitle("○" + title)
         self.group_box.resize(465, 204)
 
-        # 説明用のラベル
+        # 説明用のラベル\
         self.desc_msg = QLabel(self)
+        # self.desc_msg.move(10, 10)
+        self.desc_msg.resize(445, 50)
+        self.desc_msg.setText(desc)
+        self.desc_msg.setStyleSheet("QLabel { color: #404040; font-size: 12px; }")
+        self.vbox.addWidget(self.desc_msg)
+
+        self._initInputs()
 
         # アラート用のラベル
         self.alert_msg = QLabel(self)
+        self.vbox.addWidget(self.alert_msg)
+
+        self.group_box.setLayout(self.vbox)
+
+    @abstractmethod
+    def _initInputs(self):
+        pass
+
+    def _setAlertMsg(self):
+        pass
+
+    @abstractmethod
+    def _getInputInfoDict(self):
+        pass
+
+
+class TargetOptionPart(OptionPartWidget):
+    def __init__(self, parent):
+        super().__init__(parent,
+                         title="選択方法の設定",
+                         desc="ファイルを個別に指定するか, CJBファイルを含むフォルダを指定するかを選択できます.")
+
+    def _initInputs(self):
+        self.rbtn_files = QRadioButton("ファイル単位", self)
+        self.vbox.addWidget(self.rbtn_files)
+        self.rbtn_folders = QRadioButton("フォルダー単位", self)
+        self.vbox.addWidget(self.rbtn_folders)
+
+        self.rbtn_folders.setChecked(True)
+
+    def _getInputInfoDict(self):
+        rtn_dict = {}
+
+        if self.rbtn_files.isChecked():
+            rtn_dict["target"] = "files"
+        elif self.rbtn_folders.isChecked():
+            rtn_dict["target"] = "folders"
+        else:
+            print("Unecpected behavior in option-target")
+            rtn_dict["target"] = "folders"
+
+        return rtn_dict
+
+
+class RuntimeOptionPart(OptionPartWidget):
+    def __init__(self, parent):
+        super().__init__(parent,
+                         title="実行時の設定",
+                         desc="xxxx")
+
+    def _initInputs(self):
+        self.search_wait_time = QLineEdit(self)
+        # self.search_wait_time.move(175, 180)
+        self.search_wait_time.setValidator(QDoubleValidator(
+            0.01, 3.00, 2, notation=QDoubleValidator.StandardNotation))
+        self.search_wait_time.setText("0.2")
+        self.search_label = QLabel(self)
+        self.search_label.setText("各要素探索にかける時間(秒)")
+        # self.search_label.move(175, 160)
+
+        self.click_wait_time = QLineEdit(self)
+        # self.click_wait_time.move(175, 310)
+        self.click_wait_time.setValidator(QDoubleValidator(0.01, 3.00, 2))
+        self.click_wait_time.setText("0.1")
+        self.click_label = QLabel(self)
+        self.click_label.setText("要素をクリック後の待機時間(秒)")
+        # self.click_label.move(175, 290)
+
+        self.vbox.addWidget(self.search_wait_time)
+        self.vbox.addWidget(self.search_label)
+        self.vbox.addWidget(self.click_wait_time)
+        self.vbox.addWidget(self.click_label)
+
+    def _getInputInfoDict(self):
+        rtn_dict = {
+            "runtime": {
+                "implicitly_wait": float(self.search_wait_time.text()),
+                "click_wait": float(self.click_wait_time.text())
+            }
+        }
+
+        return rtn_dict
+
+
+class CheckOptionPart(OptionPartWidget):
+    def __init__(self, parent):
+        super().__init__(parent,
+                         title="確認項目の設定",
+                         desc="xxxx")
+
+    def _initInputs(self):
+        self.search_wait_time = QLineEdit(self)
+        # self.search_wait_time.move(175, 180)
+        self.search_wait_time.setValidator(QDoubleValidator(
+            0.01, 3.00, 2, notation=QDoubleValidator.StandardNotation))
+        self.search_wait_time.setText("0.2")
+        self.search_label = QLabel(self)
+        self.search_label.setText("各要素探索にかける時間(秒)")
+        # self.search_label.move(175, 160)
+
+        self.click_wait_time = QLineEdit(self)
+        # self.click_wait_time.move(175, 310)
+        self.click_wait_time.setValidator(QDoubleValidator(0.01, 3.00, 2))
+        self.click_wait_time.setText("0.1")
+        self.click_label = QLabel(self)
+        self.click_label.setText("要素をクリック後の待機時間(秒)")
+        # self.click_label.move(175, 290)
+
+        self.vbox.addWidget(self.search_wait_time)
+        self.vbox.addWidget(self.search_label)
+        self.vbox.addWidget(self.click_wait_time)
+        self.vbox.addWidget(self.click_label)
+
+    def _getInputInfoDict(self):
+        rtn_dict = {
+            "runtime": {
+                "implicitly_wait": float(self.search_wait_time.text()),
+                "click_wait": float(self.click_wait_time.text())
+            }
+        }
+
+        return rtn_dict
+
+
+class BrowserOptionPart(OptionPartWidget):
+    def __init__(self, parent):
+        super().__init__(parent,
+                         title="ブラウザパスの設定",
+                         desc="xxxx")
+
+    def _initInputs(self):
+        self.search_wait_time = QLineEdit(self)
+        # self.search_wait_time.move(175, 180)
+        self.search_wait_time.setValidator(QDoubleValidator(
+            0.01, 3.00, 2, notation=QDoubleValidator.StandardNotation))
+        self.search_wait_time.setText("0.2")
+        self.search_label = QLabel(self)
+        self.search_label.setText("各要素探索にかける時間(秒)")
+        # self.search_label.move(175, 160)
+
+        self.click_wait_time = QLineEdit(self)
+        # self.click_wait_time.move(175, 310)
+        self.click_wait_time.setValidator(QDoubleValidator(0.01, 3.00, 2))
+        self.click_wait_time.setText("0.1")
+        self.click_label = QLabel(self)
+        self.click_label.setText("要素をクリック後の待機時間(秒)")
+        # self.click_label.move(175, 290)
+
+        self.vbox.addWidget(self.search_wait_time)
+        self.vbox.addWidget(self.search_label)
+        self.vbox.addWidget(self.click_wait_time)
+        self.vbox.addWidget(self.click_label)
+
+    def _getInputInfoDict(self):
+        rtn_dict = {
+            "runtime": {
+                "implicitly_wait": float(self.search_wait_time.text()),
+                "click_wait": float(self.click_wait_time.text())
+            }
+        }
+
+        return rtn_dict
 
 
 class WholeOption(BaseWidget):
@@ -42,14 +216,24 @@ class WholeOption(BaseWidget):
         super().__init__(parent, title="各種設定の変更")
         self.master = parent
 
-        self.option_target = OptionPartWidget(self, "選択方法の設定")
+        # 選択方法の設定
+        self.option_target = TargetOptionPart(self)
         self.option_target.move(0 + 10, 75 + 4)
-        self.option_runtime = OptionPartWidget(self, "実行時の設定")
+
+        # 実行時の設定
+        self.option_runtime = RuntimeOptionPart(self)
         self.option_runtime.move(480 + 5, 75 + 4)
-        self.option_target = OptionPartWidget(self, "確認項目の設定")
-        self.option_target.move(0 + 10, 285 + 2)
-        self.option_runtime = OptionPartWidget(self, "ブラウザパスの設定")
-        self.option_runtime.move(480 + 5, 285 + 2)
+
+        # 選択方法の設定
+        self.option_check = CheckOptionPart(self)
+        self.option_check.move(0 + 10, 285 + 2)
+
+        # ブラウザパスの設定
+        self.option_browser = BrowserOptionPart(self)
+        self.option_browser.move(480 + 5, 285 + 2)
+
+        # self.option_runtime = OptionPartWidget(self, "ブラウザパスの設定", desc="")
+        # self.option_runtime.move(480 + 5, 285 + 2)
 
     def nextPage(self):
         pass

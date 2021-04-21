@@ -30,10 +30,11 @@ class App(QTabWidget):
         self.run_check_result = []
 
         # 各ページのインスタンス化
-        self.tab0 = optionViews.Target(self)
-        self.tab1 = optionViews.Runtime(self)
-        self.tab2 = optionViews.Check(self)
-        self.tab3 = optionViews.BrowserPath(self)
+        self.tab0 = optionViews.WholeOption(self)
+        # self.tab0 = optionViews.Target(self)
+        # self.tab1 = optionViews.Runtime(self)
+        # self.tab2 = optionViews.Check(self)
+        # self.tab3 = optionViews.BrowserPath(self)
 
         self.tab4 = selectViews.FileSelect(self)
         self.tab5 = selectViews.FolderSelect(self)
@@ -47,10 +48,11 @@ class App(QTabWidget):
         self.tab10 = endView.End(self)
 
         # タブに各ページを追加
-        self.addTab(self.tab0, "option-target")
-        self.addTab(self.tab1, "option-runtime")
-        self.addTab(self.tab2, "option-check")
-        self.addTab(self.tab3, "option-browserPath")
+        self.addTab(self.tab0, "option-whole")
+        # self.addTab(self.tab0, "option-target")
+        # self.addTab(self.tab1, "option-runtime")
+        # self.addTab(self.tab2, "option-check")
+        # self.addTab(self.tab3, "option-browserPath")
         self.addTab(self.tab4, "select-file")
         self.addTab(self.tab5, "select-folder")
         self.addTab(self.tab6, "process-file")
@@ -61,25 +63,20 @@ class App(QTabWidget):
 
         # 各ページとインデックスの対応表
         self.tab_index_dict = {
-            "option": {
-                "target": 0,
-                "runtime": 1,
-                "check": 2,
-                "browserPath": 3,
-            },
+            "option": 0,
             "select": {
-                "file": 4,
-                "folder": 5,
+                "file": 1,
+                "folder": 2,
             },
             "process": {
-                "file": 6,
-                "run": 7,
+                "file": 3,
+                "run": 4,
             },
             "log": {
-                "file": 8,
-                "run": 9,
+                "file": 5,
+                "run": 6,
             },
-            "end": 10
+            "end": 7
         }
 
         # タブパネルのボーダーを削除
